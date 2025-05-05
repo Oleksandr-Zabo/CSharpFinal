@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Core\Models\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\CSharpFinalData\CSharpFinalData.csproj" />
     </ItemGroup>
 

@@ -10,4 +10,3 @@ namespace CSharpFinal;
 public partial class App : Application
 {
 }
-

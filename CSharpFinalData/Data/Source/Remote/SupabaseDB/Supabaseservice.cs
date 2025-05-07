@@ -50,4 +50,5 @@ public class SupabaseService
             throw new Exception($"InitServiceAsync() raise Exception: {ex.Message}");
         }
     }
+    
 }

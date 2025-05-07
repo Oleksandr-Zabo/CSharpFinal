@@ -1,29 +1,31 @@
-using Supabase.Postgrest.Attributes;
-using Supabase.Postgrest.Models;
+namespace CSharpFinalCore.Core.Entity;
 
-namespace CSharpFinalCore.Core.Models;
+using CSharpFinalData.Data.Models;
 
-[Table("Roles")]
 public class Roles
 {
-    [PrimaryKey("id")]
     public int Id { get; set; }
-    
-    [Column("RoleName")]
     public string RoleName { get; set; }
-    
+
     public Roles()
     {
         Id = 0;
         RoleName = string.Empty;
     }
     
+    //using pattern adapter
+    public Roles(RolesModel rolesModel)
+    {
+        Id = rolesModel.Id;
+        RoleName = rolesModel.RoleName;
+    }
+
     public Roles(int id, string roleName)
     {
         Id = id;
         RoleName = roleName;
     }
-    
+
     public override string ToString()
     {
         return $"Id: {Id}, RoleName: {RoleName}";

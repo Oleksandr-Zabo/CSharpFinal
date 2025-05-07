@@ -1,10 +1,10 @@
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
-namespace CSharpFinalCore.Core.Models;
+namespace CSharpFinalData.Data.Models;
 
 [Table("Tasks")]
-public class Tasks
+public class TasksModel
 {
     [PrimaryKey("id")]
     public int Id { get; set; }
@@ -21,7 +21,7 @@ public class Tasks
     [Column("Status")]
     public string Status { get; set; }
     
-    public Tasks()
+    public TasksModel()
     {
         Id = 0;
         EmployeeId = 0;
@@ -30,7 +30,7 @@ public class Tasks
         Status = string.Empty;
     }
     
-    public Tasks(int id, int employeeId, string description, DateTime deadline, string status)
+    public TasksModel(int id, int employeeId, string description, DateTime deadline, string status)
     {
         Id = id;
         EmployeeId = employeeId;

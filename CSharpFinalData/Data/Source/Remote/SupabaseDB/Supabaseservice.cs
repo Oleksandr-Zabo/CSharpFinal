@@ -161,6 +161,7 @@ public class SupabaseService
                 throw new Exception("Cannot delete an admin employee.");
             }
     
+            //TO-DO: fix this
             // Proceed with deletion
             var response = await _client
                 .From<EmployeesModel>()

@@ -4,7 +4,7 @@ using Supabase.Postgrest.Models;
 namespace CSharpFinalData.Data.Models;
 
 [Table("Roles")]
-public class RolesModel
+public class RolesModel: BaseModel
 {
     [PrimaryKey("id")]
     public int Id { get; set; }

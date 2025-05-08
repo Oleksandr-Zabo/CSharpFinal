@@ -1,5 +1,7 @@
+using CSharpFinalData.Data.Models;
 using Supabase.Gotrue;
 using Client = Supabase.Client;
+using Supabase.Postgrest;
 using static Supabase.Postgrest.Constants;
 
 namespace CSharpFinalData.Data.Source.Remote.SupabaseDB;
@@ -48,6 +50,228 @@ public class SupabaseService
         catch (Exception ex)
         {
             throw new Exception($"InitServiceAsync() raise Exception: {ex.Message}");
+        }
+    }
+    
+    public async Task<Session?> RegisterAsync(string email, string password)
+    {
+        try
+        {
+            // Check if the user already exists by attempting to log in
+            var existingSession = await _client.Auth.SignIn(email, password);
+            if (existingSession != null)
+            {
+                throw new Exception("User already exists in the system.");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Ignore the login failure and proceed with registration
+            if (!ex.Message.Contains("Invalid login credentials"))
+            {
+                throw new Exception($"Error during user existence check: {ex.Message}");
+            }
+        }
+    
+        try
+        {
+            // Register the user
+            var session = await _client.Auth.SignUp(email, password);
+            return session;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"RegisterAsync(string email, string password) raise Exception: {ex.Message}");
+        }
+    }
+        
+    public async Task<Session?> LoginAsync(string email, string password)
+    {
+        try
+        {
+            var session = await _client.Auth.SignIn(email, password);
+            return session;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"LoginAsync(string email, string password) raise Exception: {ex.Message}");
+        }
+    }
+        
+    public void SetAuthUser()
+    {
+        if (_client.Auth.CurrentUser != null)
+        {
+            SupabaseUser = _client.Auth.CurrentUser;
+            IsLoggedIn = true;
+        }
+    }
+            
+    public async Task Logout()
+    {
+        try
+        {
+            await _client.Auth.SignOut();
+            IsLoggedIn = false;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Logout() raise Exception: {ex.Message}");
+        }
+    }
+    
+    // for Role: Admin - get all employees
+    public async Task<List<EmployeesModel>?> GetAllEmployees()
+    {
+        try
+        {
+            var result = await _client.From<EmployeesModel>().Get();
+            return result.Models;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"GetAllEmployees() raise Exception: {ex.Message}");
+        }
+    }
+    
+    // for Role: Admin - delete employee and check if no admin
+    public async Task<bool> DeleteEmployee(int employeeId)
+    {
+        try
+        {
+            // Fetch the employee to check their role
+            var employee = await _client
+                .From<EmployeesModel>()
+                .Where(e => e.Id == employeeId)
+                .Single();
+    
+            if (employee == null)
+            {
+                throw new Exception("Employee not found.");
+            }
+    
+            // Check if the employee is an admin
+            var role = await _client
+                .From<RolesModel>()
+                .Where(r => r.Id == employee.RoleId)
+                .Single();
+    
+            if (role != null && role.RoleName.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("Cannot delete an admin employee.");
+            }
+    
+            // Proceed with deletion
+            var response = await _client
+                .From<EmployeesModel>()
+                .Where(e => e.Id == employeeId)
+                .Delete();
+    
+            return response.Models.Count > 0; // Success if at least one record is deleted
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"DeleteEmployee(int employeeId) raise Exception: {ex.Message}");
+        }
+    }
+    
+    
+    // for Role:  Maneger- create task
+    
+    public async Task<bool> CreateTask(int taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus)
+    {
+        try
+        {
+            var result = await _client.From<TasksModel>().Insert(new TasksModel
+            {
+                EmployeeId = taskEmployeeId,
+                Description = taskDescription,
+                Deadline = taskDeadLine,
+                Status = taskStatus
+            });
+    
+            return result.Models.Count > 0; // Success if at least one record is returned
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"CreateTask(int taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus) raise Exception: {ex.Message}");
+        }
+    }
+    
+    // for Role: Maneger - get all tasks
+    public async Task<List<TasksModel>?> GetAllTasks()
+    {
+        try
+        {
+            var result = await _client.From<TasksModel>().Get();
+            return result.Models;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"GetAllTasks() raise Exception: {ex.Message}");
+        }
+    }
+    
+    // for Role: Worker - get all tasks by employeeId
+    public async Task<List<TasksModel>?> GetAllTasksByEmployeeId(int employeeId)
+    {
+        try
+        {
+            var result = await _client.From<TasksModel>().Get();
+            var tasks = result.Models.Where(task => task.EmployeeId == employeeId).ToList();
+            return tasks;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"GetAllTasksByEmployeeId(int employeeId) raise Exception: {ex.Message}");
+        }
+    }
+    
+    // for Role: Worker- update task
+    public async Task<bool> UpdateTaskWorker(int taskId, string taskStatus)
+    {
+        try
+        {
+            var result = await _client
+                .From<TasksModel>()
+                .Where(x => x.Id == taskId)
+                .Update(new TasksModel { Status = taskStatus });
+    
+            return result.Models.Count > 0; // Success if at least one record is updated
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"UpdateTaskWorker(int taskId, string taskStatus) raise Exception: {ex.Message}");
+        }
+    }
+    
+    // for Role: Worker- get info about worker by id
+    public async Task<EmployeesModel?> GetEmployeeInfoById(int employeeId)
+    {
+        try
+        {
+            var result = await _client.From<EmployeesModel>().Get();
+            var employee = result.Models.FirstOrDefault(e => e.Id == employeeId);
+            return employee;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"GetEmployeeInfo(int employeeId) raise Exception: {ex.Message}");
+        }
+    }
+    
+    // for Role: Worker - get info about worker by email
+    public async Task<EmployeesModel?> GetEmployeeInfoByEmail(string email)
+    {
+        try
+        {
+            var result = await _client.From<EmployeesModel>().Get();
+            var employee = result.Models.FirstOrDefault(e => e.Email == email);
+            return employee;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"GetEmployeeInfo(string email) raise Exception: {ex.Message}");
         }
     }
     

@@ -1,7 +1,5 @@
 namespace CSharpFinalCore.Core.Entity;
 
-using CSharpFinalData.Data.Models;
-
 public class Roles
 {
     public int Id { get; set; }
@@ -13,12 +11,6 @@ public class Roles
         RoleName = string.Empty;
     }
     
-    //using pattern adapter
-    public Roles(RolesModel rolesModel)
-    {
-        Id = rolesModel.Id;
-        RoleName = rolesModel.RoleName;
-    }
 
     public Roles(int id, string roleName)
     {

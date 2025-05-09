@@ -52,7 +52,53 @@ public class SupabaseService
             throw new Exception($"InitServiceAsync() raise Exception: {ex.Message}");
         }
     }
+
+
+    public void SetAuthUser()
+    {
+        if (_client.Auth.CurrentUser != null)
+        {
+            SupabaseUser = _client.Auth.CurrentUser;
+            IsLoggedIn = true;
+        }
+    }
     
+    public async Task<Session?> LoginAsync(string email, string password)
+    {
+        try
+        {
+            var session = await _client.Auth.SignIn(email, password);
+            if (session != null)
+            {
+                SupabaseUser = session.User;
+                IsLoggedIn = true;
+                return session;
+            }
+            else
+            {
+                throw new Exception("Login failed.");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Login(string email, string password) raise Exception: {ex.Message}");
+        }
+    }
+            
+    public async Task Logout()
+    {
+        try
+        {
+            await _client.Auth.SignOut();
+            IsLoggedIn = false;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Logout() raise Exception: {ex.Message}");
+        }
+    }
+    
+    // for Role: Admin - register new employee
     public async Task<Session?> RegisterAsync(string email, string password)
     {
         try
@@ -84,44 +130,9 @@ public class SupabaseService
             throw new Exception($"RegisterAsync(string email, string password) raise Exception: {ex.Message}");
         }
     }
-        
-    public async Task<Session?> LoginAsync(string email, string password)
-    {
-        try
-        {
-            var session = await _client.Auth.SignIn(email, password);
-            return session;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"LoginAsync(string email, string password) raise Exception: {ex.Message}");
-        }
-    }
-        
-    public void SetAuthUser()
-    {
-        if (_client.Auth.CurrentUser != null)
-        {
-            SupabaseUser = _client.Auth.CurrentUser;
-            IsLoggedIn = true;
-        }
-    }
-            
-    public async Task Logout()
-    {
-        try
-        {
-            await _client.Auth.SignOut();
-            IsLoggedIn = false;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Logout() raise Exception: {ex.Message}");
-        }
-    }
     
     // for Role: Admin - get all employees
-    public async Task<List<EmployeesModel>?> GetAllEmployees()
+    public async Task<List<EmployeesModel>?> GetAllEmployeesAsync()
     {
         try
         {
@@ -135,7 +146,7 @@ public class SupabaseService
     }
     
     // for Role: Admin - delete employee and check if no admin
-    public async Task<bool> DeleteEmployee(int employeeId)
+    public async Task<bool> DeleteEmployeeAsync(int employeeId)
     {
         try
         {
@@ -160,15 +171,13 @@ public class SupabaseService
             {
                 throw new Exception("Cannot delete an admin employee.");
             }
-    
-            //TO-DO: fix this
             // Proceed with deletion
-            var response = await _client
+            await _client
                 .From<EmployeesModel>()
                 .Where(e => e.Id == employeeId)
                 .Delete();
-    
-            return response.Models.Count > 0; // Success if at least one record is deleted
+
+            return true; // Assuming the deletion was successful if no exception was thrown
         }
         catch (Exception ex)
         {
@@ -179,7 +188,7 @@ public class SupabaseService
     
     // for Role:  Maneger- create task
     
-    public async Task<bool> CreateTask(int taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus)
+    public async Task<bool> CreateTaskAsync(int taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus)
     {
         try
         {
@@ -200,7 +209,7 @@ public class SupabaseService
     }
     
     // for Role: Maneger - get all tasks
-    public async Task<List<TasksModel>?> GetAllTasks()
+    public async Task<List<TasksModel>?> GetAllTasksAsync()
     {
         try
         {
@@ -246,7 +255,7 @@ public class SupabaseService
         }
     }
     
-    // for Role: Worker- get info about worker by id
+    // for Role: Worker - get info about worker by id
     public async Task<EmployeesModel?> GetEmployeeInfoById(int employeeId)
     {
         try
@@ -275,5 +284,4 @@ public class SupabaseService
             throw new Exception($"GetEmployeeInfo(string email) raise Exception: {ex.Message}");
         }
     }
-    
 }

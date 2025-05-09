@@ -1,7 +1,5 @@
 namespace CSharpFinalCore.Core.Entity;
 
-using CSharpFinalData.Data.Models;
-
 public class Employees
 {
     public int Id { get; set; }
@@ -19,15 +17,6 @@ public class Employees
         Password = string.Empty;
     }
     
-    //using pattern adapter
-    public Employees(EmployeesModel employeesModel)
-    {
-        Id = employeesModel.Id;
-        Name = employeesModel.Name;
-        Email = employeesModel.Email;
-        RoleId = employeesModel.RoleId;
-        Password = employeesModel.Password;
-    }
 
     public Employees(int id, string name, string email, int roleId, string password)
     {

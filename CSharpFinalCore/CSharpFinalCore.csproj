@@ -6,12 +6,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\CSharpFinalData\CSharpFinalData.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Core\Repository\" />
-    </ItemGroup>
-
 </Project>

@@ -11,9 +11,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Data\RepositoryImpl\AdminRepositoryImpl\" />
-      <Folder Include="Data\RepositoryImpl\LoginRepositoryImpl\" />
-      <Folder Include="Data\RepositoryImpl\ManagerRepositoryImpl\" />
       <Folder Include="Data\RepositoryImpl\WorkerRepositoryImpl\" />
     </ItemGroup>
 

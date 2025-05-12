@@ -1,3 +1,4 @@
+using CSharpFinalCore.Core.Entity;
 using CSharpFinalData.Data.Models;
 using Supabase.Gotrue;
 using Client = Supabase.Client;
@@ -98,13 +99,28 @@ public class SupabaseService
         }
     }
     
+    // get employye by user
+    public async Task<EmployeesModel?> GetEmployeeByUserAsync(string email, string password)
+    {
+        try
+        {
+            var result = await _client.From<EmployeesModel>().Get();
+            var employee = result.Models.FirstOrDefault(e => e.Email == email && e.Password == password);
+            return employee;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"GetEmployeeByUser(string email, string password) raise Exception: {ex.Message}");
+        }
+    }
+    
     // for Role: Admin - register new employee
-    public async Task<Session?> RegisterAsync(string email, string password)
+    public async Task<Session?> RegisterAsync(EmployeesModel employee)
     {
         try
         {
             // Check if the user already exists by attempting to log in
-            var existingSession = await _client.Auth.SignIn(email, password);
+            var existingSession = await _client.Auth.SignIn(employee.Email, employee.Password);
             if (existingSession != null)
             {
                 throw new Exception("User already exists in the system.");
@@ -121,13 +137,50 @@ public class SupabaseService
     
         try
         {
-            // Register the user
-            var session = await _client.Auth.SignUp(email, password);
-            return session;
+            // Register the user- register+ add data to tables
+            var session = await _client.Auth.SignUp(employee.Email, employee.Password);
+            if (session != null)
+            {
+                // Add the employee to the Employees table
+                var result = await _client.From<EmployeesModel>().Insert(new EmployeesModel
+                {
+                    Name = employee.Name,
+                    Email = employee.Email,
+                    RoleId = employee.RoleId,
+                    Password = employee.Password
+                });
+    
+                if (result.Models.Count > 0)
+                {
+                    return session;
+                }
+                else
+                {
+                    throw new Exception("Failed to add employee to the database.");
+                }
+            }
+            else
+            {
+                throw new Exception("Registration failed.");
+            }
         }
         catch (Exception ex)
         {
-            throw new Exception($"RegisterAsync(string email, string password) raise Exception: {ex.Message}");
+            throw new Exception($"RegisterAsync(EmployeesModel employee) raise Exception: {ex.Message}");
+        }
+    }
+    
+    // for Role: Admin - get all roles
+    public async Task<List<RolesModel>?> GetAllRolesAsync()
+    {
+        try
+        {
+            var result = await _client.From<RolesModel>().Get();
+            return result.Models;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"GetAllRoles() raise Exception: {ex.Message}");
         }
     }
     
@@ -146,7 +199,7 @@ public class SupabaseService
     }
     
     // for Role: Admin - delete employee and check if no admin
-    public async Task<bool> DeleteEmployeeAsync(int employeeId)
+    public async Task<bool>? DeleteEmployeeAsync(int employeeId)
     {
         try
         {
@@ -284,4 +337,5 @@ public class SupabaseService
             throw new Exception($"GetEmployeeInfo(string email) raise Exception: {ex.Message}");
         }
     }
+    
 }

@@ -7,13 +7,7 @@ using static Supabase.Postgrest.Constants;
 
 namespace CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
-/// <summary>
-/// Provides services to interact with Supabase.
-/// </summary>
-/// <remarks>
-/// This class handles initialization and user session management for the Supabase client.
-/// It is designed to work with a specific Supabase project's URL and API key.
-/// </remarks>
+
 public class SupabaseService
 {
     

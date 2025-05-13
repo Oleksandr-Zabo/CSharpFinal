@@ -41,6 +41,6 @@ public class EmployeesModel: BaseModel
     
     public override string ToString()
     {
-        return $"Id: {Id}, Name: {Name}, Email: {Email}, RoleId: {RoleId}, Password: {Password}";
+        return $"Id: {Id}, Name: {Name}, Email: {Email}, RoleId: {RoleId}";
     }
 }

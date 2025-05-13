@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpFinal", "CSharpFinal\CSharpFinal.csproj", "{2CDD9BD8-7F35-4722-96F1-A8AA0DEB0657}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpFinalApp", "CSharpFinalApp\CSharpFinalApp.csproj", "{2CDD9BD8-7F35-4722-96F1-A8AA0DEB0657}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpFinalCore", "CSharpFinalCore\CSharpFinalCore.csproj", "{7A12A0F0-F45F-4F43-ACFD-5BAC69D649EE}"
 EndProject

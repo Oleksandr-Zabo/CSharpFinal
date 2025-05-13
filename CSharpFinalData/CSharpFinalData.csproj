@@ -11,10 +11,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Data\RepositoryImpl\WorkerRepositoryImpl\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\CSharpFinalCore\CSharpFinalCore.csproj" />
     </ItemGroup>
 

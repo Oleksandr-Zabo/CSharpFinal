@@ -18,7 +18,7 @@ public class RolesModel: BaseModel
         RoleName = string.Empty;
     }
     
-    public RolesModel(int id, string roleName)
+    public RolesModel(int id, string roleName): this()
     {
         Id = id;
         RoleName = roleName;

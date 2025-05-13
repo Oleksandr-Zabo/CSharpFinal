@@ -30,7 +30,7 @@ public class EmployeesModel: BaseModel
         Password = string.Empty;
     }
     
-    public EmployeesModel(int id, string name, string email, int roleId, string password)
+    public EmployeesModel(int id, string name, string email, int roleId, string password): this()
     {
         Id = id;
         Name = name;

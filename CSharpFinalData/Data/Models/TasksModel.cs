@@ -30,7 +30,7 @@ public class TasksModel: BaseModel
         Status = string.Empty;
     }
     
-    public TasksModel(int id, int employeeId, string description, DateTime deadline, string status)
+    public TasksModel(int id, int employeeId, string description, DateTime deadline, string status): this()
     {
         Id = id;
         EmployeeId = employeeId;

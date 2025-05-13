@@ -5,15 +5,10 @@ using CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
 namespace CSharpFinalData.Data.RepositoryImpl.AdminRepositoryImpl;
 
-public class AdminRepositoryImpl: AdminRepository
+public class AdminRepositoryImpl(SupabaseService supabaseService) : AdminRepository
 {
-    private readonly SupabaseService? _supabaseService;
-    
-    public AdminRepositoryImpl(SupabaseService supabaseService)
-    {
-        _supabaseService = supabaseService;
-    }
-    
+    private readonly SupabaseService? _supabaseService = supabaseService;
+
     public override async Task<List<Roles>> GetAllRolesAsync()
     {
         if (_supabaseService == null)
@@ -48,14 +43,7 @@ public class AdminRepositoryImpl: AdminRepository
 
     public override async Task<bool> AddEmployeeAsync(Employees employee)
     {
-        var employeeModel = new EmployeesModel
-        {
-            Id = employee.Id,
-            Name = employee.Name,
-            Email = employee.Email,
-            Password = employee.Password,
-            RoleId = employee.RoleId
-        };
+        var employeeModel = new AdapterEmployeeToModel(employee);
         
         return await (_supabaseService != null ? 
             Task.FromResult((await _supabaseService.RegisterAsync(employeeModel)) != null) : 

@@ -5,14 +5,9 @@ using CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
 namespace CSharpFinalData.Data.RepositoryImpl.ManagerRepositoryImpl;
 
-public class ManagerRepositoryImpl: ManagerRepository
+public class ManagerRepositoryImpl(SupabaseService supabaseService) : ManagerRepository
 {
-    private readonly SupabaseService? _supabaseService;
-    
-    public ManagerRepositoryImpl(SupabaseService supabaseService)
-    {
-        _supabaseService = supabaseService;
-    }
+    private readonly SupabaseService? _supabaseService = supabaseService;
 
     public override async Task<List<Employees>> GetAllEmployeesAsync()
     {
@@ -52,13 +47,7 @@ public class ManagerRepositoryImpl: ManagerRepository
         try
         {
             var tasksModels = await _supabaseService.GetAllTasksAsync() ?? new List<TasksModel>();
-            return tasksModels.Select(tm => new Tasks(
-                id: tm.Id,
-                employeeId: tm.EmployeeId,
-                description: tm.Description,
-                deadline: tm.Deadline,
-                status: tm.Status
-            )).ToList();
+            return tasksModels.Select(tm => (Tasks)new AdapterTaskFromModel(tm)).ToList();
         }
         catch (Exception ex)
         {

@@ -93,7 +93,7 @@ public class SupabaseService
         }
     }
     
-    // get employye by user
+    // get employee by user
     public async Task<EmployeesModel?> GetEmployeeByUserAsync(string email, string password)
     {
         try
@@ -233,7 +233,7 @@ public class SupabaseService
     }
     
     
-    // for Role:  Maneger- create task
+    // for Role: Manager - create a task
     
     public async Task<bool> CreateTaskAsync(int taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus)
     {
@@ -255,7 +255,7 @@ public class SupabaseService
         }
     }
     
-    // for Role: Maneger - get all tasks
+    // for Role: Manager - get all tasks
     public async Task<List<TasksModel>?> GetAllTasksAsync()
     {
         try

@@ -5,16 +5,11 @@ using CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
 namespace CSharpFinalData.Data.RepositoryImpl.LoginRepositoryImpl;
 
-public class LoginRepositoryImpl: LoginRepository<UserModel>
+public class LoginRepositoryImpl(SupabaseService supabaseService) : LoginRepository<UserModel>
 {
-    private readonly SupabaseService? _supabaseService;
-    
-    public LoginRepositoryImpl(SupabaseService supabaseService)
-    {
-        _supabaseService = supabaseService;
-    }
-    
-   public override async Task<UserModel> LoginAsync(string email, string password)
+    private readonly SupabaseService? _supabaseService = supabaseService;
+
+    public override async Task<UserModel> LoginAsync(string email, string password)
    {
        try
        {
@@ -22,7 +17,7 @@ public class LoginRepositoryImpl: LoginRepository<UserModel>
            if (session?.User?.Id != null)
            {
                return new UserModel(
-                   id: session.User.Id.GetHashCode(), // Assuming `Id` is a string, convert it to an int hash
+                   id: session.User.Id.GetHashCode(), // Assuming `ID` is a string, convert it to an int hash
                    login: email,
                    password: password
                );
@@ -43,13 +38,7 @@ public class LoginRepositoryImpl: LoginRepository<UserModel>
             var employee = await _supabaseService?.GetEmployeeByUserAsync(email, password)!;
             if (employee != null)
             {
-                return new Employees(
-                    id: employee.Id,
-                    name: employee.Name,
-                    email: employee.Email,
-                    roleId: employee.RoleId,
-                    password: employee.Password
-                );
+                return new AdapterEmployeeFromModel(employee);
             }
             else
             {

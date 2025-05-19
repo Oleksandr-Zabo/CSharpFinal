@@ -108,6 +108,21 @@ public class SupabaseService
         }
     }
     
+    // for Role: Admin - is employee by email
+    public async Task<bool> IsEmployeeByEmail(string email)
+    {
+        try
+        {
+            var result = await _client.From<EmployeesModel>().Get();
+            var employee = result.Models.FirstOrDefault(e => e.Email == email);
+            return employee != null;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"IsEmployeeByEmail(string email) raise Exception: {ex.Message}");
+        }
+    }
+    
     // for Role: Admin - register new employee
     public async Task<Session?> RegisterAsync(EmployeesModel employee)
     {

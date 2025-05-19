@@ -50,5 +50,14 @@ public class AdminRepositoryImpl(SupabaseService supabaseService) : AdminReposit
             Task.FromResult(false));
     }
 
+    public override async Task<bool> IsUserByEmailAsync(string email)
+    {
+        if (_supabaseService == null)
+        {
+            return false;
+        }
+    
+        return await _supabaseService.IsEmployeeByEmail(email)!;
+    }
     
 }

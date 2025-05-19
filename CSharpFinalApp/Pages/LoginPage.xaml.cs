@@ -26,16 +26,27 @@ public partial class LoginPage : UserControl
         {
             // Use a concrete implementation of LoginRepository
             var loginRepository = new LoginRepositoryImpl(_supabaseService);
-            var employee = await loginRepository.LoginAsync(email, password);
-    
-            if (employee != null)
+            var user = await loginRepository.LoginAsync(email, password);
+            
+            var employee = await loginRepository.GetEmployeeByUserAsync(email, password);
+
+            MessageBox.Show("Login successful!");
+            // Navigate to the Page based on the role switch-case - Admin- 0 (AdminPage) Manager-1 (ManagerPage) Waiter-2 (WorkerPage) Chef- 3(WorkerPage) else- unknown
+            switch (employee.RoleId)
             {
-                MessageBox.Show("Login successful!");
-                // Navigate to the AdminPage or perform other actions
-            }
-            else
-            {
-                MessageBox.Show("Invalid email or password.");
+                case 0:
+                    // Navigate to AdminPage
+                    break;
+                case 1:
+                    // Navigate to ManagerPage
+                    break;
+                case 2:
+                case 3:
+                    // Navigate to WorkerPage
+                    break;
+                default:
+                    MessageBox.Show("Unknown role.");
+                    break;
             }
         }
         catch (Exception exception)

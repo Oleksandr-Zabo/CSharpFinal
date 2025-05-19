@@ -24,7 +24,7 @@ public class LoginRepositoryImpl(SupabaseService supabaseService) : LoginReposit
            }
            throw new Exception("Login failed. User session is null.");
        }
-       catch (Exception ex)
+       catch (Exception ex) 
        {
            throw new Exception($"LoginAsync(string email, string password) raised an exception: {ex.Message}");
        }

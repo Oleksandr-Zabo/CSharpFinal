@@ -31,6 +31,10 @@
     <ItemGroup>
       <None Remove="Assets\Icon\logo.ico" />
       <Resource Include="Assets\Icon\logo.ico" />
+      <None Remove="Assets\Images\fon.png" />
+      <Resource Include="Assets\Images\fon.png" />
+      <None Remove="Assets\Images\chef.png" />
+      <Resource Include="Assets\Images\chef.png" />
     </ItemGroup>
 
 </Project>

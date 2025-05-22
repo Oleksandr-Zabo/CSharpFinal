@@ -36,6 +36,9 @@ public partial class LoginPage : UserControl
             {
                 case 0:
                     // Navigate to AdminPage
+                    var adminPage = new AdminPage(employee, _supabaseService);
+                    if (Application.Current.MainWindow != null)
+                        Application.Current.MainWindow.Resources["MainFrame"] = adminPage;
                     break;
                 case 1:
                     // Navigate to ManagerPage

@@ -31,21 +31,23 @@ public partial class LoginPage : UserControl
             var employee = await loginRepository.GetEmployeeByUserAsync(email, password);
 
             MessageBox.Show("Login successful!");
-            // Navigate to the Page based on the role switch-case - Admin- 0 (AdminPage) Manager-1 (ManagerPage) Waiter-2 (WorkerPage) Chef- 3(WorkerPage) else- unknown
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            // Navigate to the Page based on the role switch-case - Admin- 0 (AdminPage) Manager-1 (ManagerPage) Waiter-2 (WorkerPage) Chef- 3(WorkerPage) else-unknown
             switch (employee.RoleId)
             {
                 case 0:
                     // Navigate to AdminPage
-                    var adminPage = new AdminPage(employee, _supabaseService);
-                    if (Application.Current.MainWindow != null)
-                        Application.Current.MainWindow.Resources["MainFrame"] = adminPage;
+                    
+                    mainWindow?.MainWindowFrame.Navigate(new AdminPage(employee, _supabaseService));
                     break;
                 case 1:
                     // Navigate to ManagerPage
+                    mainWindow?.MainWindowFrame.Navigate(new ManagerPage(employee, _supabaseService));
                     break;
                 case 2:
                 case 3:
                     // Navigate to WorkerPage
+                    mainWindow?.MainWindowFrame.Navigate(new WorkerPage(employee, _supabaseService));
                     break;
                 default:
                     MessageBox.Show("Unknown role.");

@@ -3,10 +3,100 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:CSharpFinal.Pages"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="750" d:DesignWidth="800" MinHeight="650" MinWidth="750">
+    <UserControl.Background>
+        <LinearGradientBrush>
+            <GradientStop Color="#CE9FFC" Offset="0.0" />
+            <GradientStop Color="#7367F0" Offset="0.50" />
+        </LinearGradientBrush>
+    </UserControl.Background>
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <!-- Admin Card (Left) -->
+        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="30">
+            <materialDesign:Card
+                materialDesign:UniformCornerRadius="20"
+                materialDesign:ElevationAssist.Elevation="Dp16"
+                MaxWidth="630" MaxHeight="600" MinHeight="550" MinWidth="400">
+                <StackPanel Orientation="Vertical" Margin="20" VerticalAlignment="Stretch">
+                    <!-- Logout Button at the top -->
+                    <Button Content="Вийти" Height="35" Margin="0 0 0 15"
+                            HorizontalAlignment="Left"
+                            Click="OnLogoutClick"
+                            Style="{StaticResource MaterialDesignRaisedButton}"/>
+                    <TextBlock Text="Додавання працівника" FontSize="22" Padding="0 10 0 10"
+                               FontWeight="Bold" Foreground="Azure" HorizontalAlignment="Center"/>
+                    <StackPanel Orientation="Vertical" Margin="0 0 0 10">
+                        <!-- Name -->
+                        <DockPanel Margin="0 5 0 5">
+                            <materialDesign:PackIcon Kind="Account" Width="24" Height="24" Foreground="White" Margin="0 0 10 0"/>
+                            <TextBox x:Name="NameTextBox" FontSize="14"
+                                     materialDesign:HintAssist.Hint="Ім'я"
+                                     materialDesign:HintAssist.Foreground="White"
+                                     Foreground="White"
+                                     Background="Transparent"
+                                     BorderBrush="White"/>
+                        </DockPanel>
+                        <!-- Email -->
+                        <DockPanel Margin="0 5 0 5">
+                            <materialDesign:PackIcon Kind="Email" Width="24" Height="24" Foreground="White" Margin="0 0 10 0"/>
+                            <TextBox x:Name="EmailTextBox" FontSize="14"
+                                     materialDesign:HintAssist.Hint="Email"
+                                     materialDesign:HintAssist.Foreground="White"
+                                     Foreground="White"
+                                     Background="Transparent"
+                                     BorderBrush="White"/>
+                        </DockPanel>
+                        <!-- Password -->
+                        <DockPanel Margin="0 5 0 5">
+                            <materialDesign:PackIcon Kind="Lock" Width="24" Height="24" Foreground="White" Margin="0 0 10 0"/>
+                            <PasswordBox x:Name="PasswordBox" FontSize="14"
+                                         materialDesign:HintAssist.Hint="Пароль"
+                                         materialDesign:HintAssist.Foreground="White"
+                                         Foreground="White"
+                                         Background="Transparent"
+                                         BorderBrush="White"/>
+                        </DockPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 5">
+                            <RadioButton x:Name="AdminRadio" Content="Адмін" GroupName="Role" Margin="0 0 10 0" Foreground="White"/>
+                            <RadioButton x:Name="ManagerRadio" Content="Менеджер" GroupName="Role" Margin="0 0 10 0" Foreground="White"/>
+                            <RadioButton x:Name="WaiterRadio" Content="Офіціант" GroupName="Role" Margin="0 0 10 0" Foreground="White"/>
+                            <RadioButton x:Name="ChefRadio" Content="Шеф-кухар" GroupName="Role" Foreground="White"/>
+                        </StackPanel>
+                        <Button Content="Додати працівника" Margin="0 10 0 0" Height="35"
+                                Click="OnAddEmployeeClick"
+                                Style="{StaticResource MaterialDesignRaisedButton}" />
+                    </StackPanel>
+                    <Separator Margin="0 10 0 10"/>
+                    <TextBlock Text="Список працівників" FontSize="18" FontWeight="Bold" Foreground="Azure" Margin="0 0 0 5"/>
+                    <Border BorderBrush="White" BorderThickness="2" CornerRadius="8" Background="#30FFFFFF" Margin="0 0 0 10">
+                        <ListBox x:Name="EmployeesListBox" Height="120"
+                                 DisplayMemberPath="Name"
+                                 SelectedValuePath="Id"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 Background="Transparent"
+                                 Foreground="White"
+                                 BorderThickness="0"
+                                 />
+                    </Border>
+                    <!-- Delete Button at the bottom -->
+                    <Button Content="Видалити працівника" Height="40" Margin="0 15 0 0"
+                            Click="OnDeleteEmployeeClick"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            IsEnabled="True"/>
+                </StackPanel>
+            </materialDesign:Card>
+        </StackPanel>
+        <!-- Image (Right) -->
+        <Image Grid.Column="1"
+               Source="/Assets/Images/fon.png"
+               Stretch="UniformToFill"
+               VerticalAlignment="Stretch"
+               HorizontalAlignment="Stretch"/>
     </Grid>
 </UserControl>

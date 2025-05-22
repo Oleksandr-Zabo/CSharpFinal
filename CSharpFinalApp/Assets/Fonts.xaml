@@ -1,6 +1,0 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <FontFamily x:Key="RobotoRegular">pack://application:,,,/CSharpFinalApp;component/Assets/Fonts/#Roboto</FontFamily>
-    <FontFamily x:Key="RobotoBold">pack://application:,,,/CSharpFinalApp;component/Assets/Fonts/#Roboto Bold</FontFamily>
-    <FontFamily x:Key="RobotoItalic">pack://application:,,,/CSharpFinalApp;component/Assets/Fonts/#Roboto Italic</FontFamily>
-</ResourceDictionary>

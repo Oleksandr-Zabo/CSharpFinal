@@ -22,7 +22,7 @@
             <materialDesign:Card
                 materialDesign:UniformCornerRadius="20"
                 materialDesign:ElevationAssist.Elevation="Dp16"
-                MaxWidth="630" MaxHeight="600" MinHeight="550" MinWidth="400">
+                MaxWidth="630" MaxHeight="600" MinHeight="5 50" MinWidth="400">
                 <StackPanel Orientation="Vertical" Margin="20" VerticalAlignment="Stretch">
                     <!-- Logout Button at the top -->
                     <Button Content="Вийти" Height="35" Margin="0 0 0 15"

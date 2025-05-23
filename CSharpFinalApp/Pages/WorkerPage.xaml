@@ -3,10 +3,87 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:CSharpFinal.Pages"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="750" d:DesignWidth="800" MinHeight="650" MinWidth="750">
+    <UserControl.Background>
+        <LinearGradientBrush>
+            <GradientStop Color="#CE9FFC" Offset="0.0" />
+            <GradientStop Color="#7367F0" Offset="0.50" />
+        </LinearGradientBrush>
+    </UserControl.Background>
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <!-- Worker Card (Left) -->
+        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="30">
+            <materialDesign:Card
+                materialDesign:UniformCornerRadius="20"
+                materialDesign:ElevationAssist.Elevation="Dp16"
+                MaxWidth="630" MaxHeight="700" MinHeight="600" MinWidth="400">
+                <StackPanel Orientation="Vertical" Margin="20" VerticalAlignment="Stretch">
+                    <!-- Logout Button -->
+                    <Button Content="Вийти" Height="35" Margin="0 0 0 15"
+                            HorizontalAlignment="Left"
+                            Click="OnLogoutClick"
+                            Style="{StaticResource MaterialDesignRaisedButton}"/>
+                    <!-- Worker Info at the top -->
+                    <Border BorderBrush="Azure" BorderThickness="2" CornerRadius="10" Background="#222831" Margin="0 0 0 15" Padding="10">
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                            <TextBlock Text="Про мене:" FontSize="28" TextAlignment="Center" FontWeight="Bold" Foreground="AliceBlue" Margin="0 0 0 8"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/Assets/Images/worker.png" Width="60" Height="60" Margin="0 0 20 0"/>
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Ім'я: " FontSize="16" FontWeight="Bold" Foreground="Azure"/>
+                                        <TextBlock x:Name="WorkerNameText" FontSize="16" FontWeight="Bold" Foreground="#222"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Email: " FontSize="14" FontWeight="Bold" Foreground="Azure"/>
+                                        <TextBlock x:Name="WorkerEmailText" FontSize="14" Foreground="#222"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Роль: " FontSize="14" FontWeight="Bold" Foreground="Azure"/>
+                                        <TextBlock x:Name="WorkerRoleText" FontSize="14" Foreground="#222"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Text="Список завдань" FontSize="18" FontWeight="Bold" Foreground="Azure" Margin="0 0 0 5"/>
+                    <Border BorderBrush="White" BorderThickness="2" CornerRadius="10" Background="#333446" Margin="0 0 0 10">
+                        <DataGrid x:Name="TasksDataGrid" Height="180"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  Background="Transparent"
+                                  Foreground="White"
+                                  BorderThickness="0"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal"
+                                  SelectionMode="Single"
+                                  SelectionUnit="FullRow"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Опис" Binding="{Binding Description}" Width="2*"/>
+                                <DataGridTextColumn Header="Дедлайн" Binding="{Binding Deadline, StringFormat=d}" Width="*"/>
+                                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                    <Button Content="До наступної фази" Height="40" Margin="0 10 0 0"
+                            Click="OnNextPhaseClick"
+                            Style="{StaticResource MaterialDesignRaisedButton}"/>
+                </StackPanel>
+            </materialDesign:Card>
+        </StackPanel>
+        <!-- Image (Right) -->
+        <Image Grid.Column="1"
+               Source="/Assets/Images/fon.png"
+               Stretch="UniformToFill"
+               VerticalAlignment="Stretch"
+               HorizontalAlignment="Stretch"/>
     </Grid>
 </UserControl>

@@ -45,6 +45,9 @@ public partial class LoginPage : UserControl
                     mainWindow?.MainWindowFrame.Navigate(new ManagerPage(employee, _supabaseService));
                     break;
                 case 2:
+                    // Navigate to WorkerPage
+                    mainWindow?.MainWindowFrame.Navigate(new WorkerPage(employee, _supabaseService));
+                    break;
                 case 3:
                     // Navigate to WorkerPage
                     mainWindow?.MainWindowFrame.Navigate(new WorkerPage(employee, _supabaseService));

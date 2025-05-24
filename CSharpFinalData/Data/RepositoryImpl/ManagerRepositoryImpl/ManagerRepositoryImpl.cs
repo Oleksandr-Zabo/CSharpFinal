@@ -54,4 +54,20 @@ public class ManagerRepositoryImpl(SupabaseService supabaseService) : ManagerRep
             throw new Exception($"GetAllTasksAsync() raised an exception: {ex.Message}");
         }
     }
+
+    public async Task Logout()
+    {
+        if (_supabaseService == null)
+        {
+            return;
+        }
+        try
+        {
+            await _supabaseService.LogoutAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Logout() raised an exception: {ex.Message}");
+        }
+    }
 }

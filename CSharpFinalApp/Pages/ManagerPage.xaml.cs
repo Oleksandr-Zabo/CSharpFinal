@@ -5,22 +5,24 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using CSharpFinalCore.Core.Entity;
-using CSharpFinalData.Data.Source.Remote.SupabaseDB;
+using CSharpFinalData.Data.Models;
+using CSharpFinalData.Data.RepositoryImpl.ManagerRepositoryImpl;
+using System.IO;
 
 namespace CSharpFinal.Pages;
 
 public partial class ManagerPage : UserControl
 {
-    private readonly SupabaseService _supabaseService;
+    private readonly ManagerRepositoryImpl _managerRepository;
     private readonly Employees _employee;
     private List<Employees> _workers = new();
     private List<TaskViewModel> _tasks = new();
 
-    public ManagerPage(Employees employee, SupabaseService? service)
+    public ManagerPage(Employees employee, ManagerRepositoryImpl? repository)
     {
         InitializeComponent();
         _employee = employee ?? throw new ArgumentNullException(nameof(employee));
-        _supabaseService = service ?? throw new ArgumentNullException(nameof(service));
+        _managerRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         Loaded += ManagerPage_Loaded;
     }
 
@@ -34,18 +36,11 @@ public partial class ManagerPage : UserControl
     {
         try
         {
-            var allEmployees = await _supabaseService.GetAllEmployeesAsync();
-            _workers = allEmployees
-                .Where(w => w.RoleId == 2 || w.RoleId == 3)
-                .Select(w => new Employees
-                {
-                    Id = w.Id,
-                    Name = w.Name,
-                    RoleId = w.RoleId,
-                    // Map other properties as needed
-                })
-                .ToList();
-            WorkerComboBox.ItemsSource = _workers;
+           var allEmployees = await _managerRepository.GetAllEmployeesAsync();
+           _workers = allEmployees
+               .Where(w => w.RoleId == 2 || w.RoleId == 3)
+               .ToList();
+           WorkerComboBox.ItemsSource = _workers;
         }
         catch (Exception ex)
         {
@@ -57,8 +52,7 @@ public partial class ManagerPage : UserControl
     {
         try
         {
-            var allTasks = await _supabaseService.GetAllTasksAsync();
-            // Map tasks to view model with worker name
+            var allTasks = await _managerRepository.GetAllTasksAsync();
             _tasks = allTasks.Select(t => new TaskViewModel
             {
                 Id = t.Id,
@@ -102,7 +96,7 @@ public partial class ManagerPage : UserControl
 
         try
         {
-            await _supabaseService.CreateTaskAsync(selectedWorker.Id, description, deadline, "new");
+            await _managerRepository.CreateTaskAsync(selectedWorker.Id, description, deadline, "new");
             MessageBox.Show("Завдання додано!");
             TaskDescriptionTextBox.Text = "";
             DeadlineDatePicker.SelectedDate = null;
@@ -119,14 +113,53 @@ public partial class ManagerPage : UserControl
     {
         await LoadTasksAsync();
     }
-    
+
     private void OnLogoutClick(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show("Ви впевнені, що хочете вийти?", "Підтвердження", MessageBoxButton.YesNo);
         if (result != MessageBoxResult.Yes) return;
-        _ = _supabaseService.Logout();
+        _ = _managerRepository.Logout();
         var mainWindow = (MainWindow)Application.Current.MainWindow;
         mainWindow?.MainWindowFrame.Navigate(new LoginPage());
+    }
+    
+    private async void OnCreateReportClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var reportLines = new List<string>
+            {
+                $"Звіт створено: {DateTime.Now:G}",
+                "Список завдань:"
+            };
+    
+            foreach (var task in _tasks)
+            {
+                reportLines.Add($"Опис: {task.Description}");
+                reportLines.Add($"Працівник: {task.WorkerName}");
+                reportLines.Add($"Дедлайн: {task.Deadline:d}");
+                reportLines.Add($"Статус: {task.Status}");
+                reportLines.Add(""); // Empty line between tasks
+            }
+    
+            reportLines.Add("-------------------------");
+            reportLines.Add(""); // Extra line for separation
+    
+            // Get project directory
+            var projectDir = AppDomain.CurrentDomain.BaseDirectory;
+            var reportDir = Path.Combine(projectDir, "manager's_report");
+            Directory.CreateDirectory(reportDir);
+    
+            var filePath = Path.Combine(reportDir, "manager_report.txt");
+    
+            await File.AppendAllLinesAsync(filePath, reportLines);
+    
+            MessageBox.Show($"Звіт додано до файлу:\n{filePath}");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Помилка при створенні звіту: " + ex.Message);
+        }
     }
 
     // View model for DataGrid

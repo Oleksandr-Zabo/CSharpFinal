@@ -10,7 +10,6 @@ namespace CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
 public class SupabaseService
 {
-    
     private const string SupabaseUrl = "https://blsbwhilzmlhlhxywfpl.supabase.co";
     private const string SupabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsc2J3aGlsem1saGxoeHl3ZnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU5NDg0MTYsImV4cCI6MjA2MTUyNDQxNn0.QN24DqtBr6wFqHNyAYw-XOoHGxbxx0fneOoDJxFsDHo";
     
@@ -20,6 +19,8 @@ public class SupabaseService
         
     public bool IsLoggedIn { get; set; } = false;
         
+    private static SupabaseService? _instance;//for pattern Singleton
+    private static readonly object Lock = new();
     public SupabaseService()
     {
         try
@@ -36,6 +37,17 @@ public class SupabaseService
         }
     }
         
+    public static SupabaseService Instance// Singleton pattern
+    {
+        get
+        {
+            lock (Lock)
+            {
+                return _instance ??= new SupabaseService();
+            }
+        }
+    }
+    
     public async Task InitServiceAsync()
     {
         try
@@ -80,7 +92,7 @@ public class SupabaseService
         }
     }
             
-    public async Task Logout()
+    public async Task LogoutAsync()
     {
         try
         {

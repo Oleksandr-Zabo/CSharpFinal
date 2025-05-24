@@ -59,5 +59,20 @@ public class AdminRepositoryImpl(SupabaseService supabaseService) : AdminReposit
     
         return await _supabaseService.IsEmployeeByEmail(email)!;
     }
-    
+
+    public async Task Logout()
+    {
+        if (_supabaseService == null)
+        {
+            return;
+        }
+        try
+        {
+            await _supabaseService.LogoutAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Logout() raised an exception: {ex.Message}");
+        }
+    }
 }

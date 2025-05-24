@@ -5,14 +5,9 @@ using CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
 namespace CSharpFinalData.Data.RepositoryImpl.WorkerRepositoryImpl;
 
-public class WorkerRepositoryImpl : WorkerRepository
+public class WorkerRepositoryImpl(SupabaseService supabaseService) : WorkerRepository
 {
-    private readonly SupabaseService _supabaseService;
-
-    public WorkerRepositoryImpl()
-    {
-        _supabaseService = new SupabaseService();
-    }
+    private readonly SupabaseService _supabaseService = supabaseService ?? throw new ArgumentNullException(nameof(supabaseService), "SupabaseService cannot be null");
 
     public override async Task<bool> UpdateTaskWorker(int taskId, string taskStatus)
     {
@@ -70,6 +65,36 @@ public class WorkerRepositoryImpl : WorkerRepository
         catch (Exception ex)
         {
             throw new Exception($"GetEmployeeInfoByEmail(string email) failed: {ex.Message}");
+        }
+    }
+
+    public async Task<List<RolesModel>?> GetAllRolesAsync()
+    {
+        try
+        {
+            await _supabaseService.InitServiceAsync();
+            var roles = await _supabaseService.GetAllRolesAsync();
+            return roles?.Select(r => new RolesModel { Id = r.Id, RoleName = r.RoleName }).ToList();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"GetAllRolesAsync() failed: {ex.Message}");
+        }
+    }
+
+    public async Task Logout()
+    {
+        if (_supabaseService == null)
+        {
+            return;
+        }
+        try
+        {
+            await _supabaseService.LogoutAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Logout() raised an exception: {ex.Message}");
         }
     }
 }

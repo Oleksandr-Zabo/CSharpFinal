@@ -5,22 +5,23 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using CSharpFinalCore.Core.Entity;
-using CSharpFinalData.Data.Source.Remote.SupabaseDB;
+using CSharpFinalData.Data.Models;
+using CSharpFinalData.Data.RepositoryImpl.WorkerRepositoryImpl;
 
 namespace CSharpFinal.Pages;
 
 public partial class WorkerPage : UserControl
 {
-    private readonly SupabaseService _supabaseService;
+    private readonly WorkerRepositoryImpl _workerRepository;
     private readonly Employees _employee;
     private List<TaskViewModel> _tasks = new();
     private string _roleName = "";
 
-    public WorkerPage(Employees employee, SupabaseService? service)
+    public WorkerPage(Employees employee, WorkerRepositoryImpl? repository)
     {
         InitializeComponent();
         _employee = employee ?? throw new ArgumentNullException(nameof(employee));
-        _supabaseService = service ?? throw new ArgumentNullException(nameof(service));
+        _workerRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         Loaded += WorkerPage_Loaded;
     }
 
@@ -42,7 +43,7 @@ public partial class WorkerPage : UserControl
     {
         try
         {
-            var roles = await _supabaseService.GetAllRolesAsync();
+            var roles = await _workerRepository.GetAllRolesAsync();
             var role = roles?.FirstOrDefault(r => r.Id == roleId);
             return role?.RoleName ?? "Невідомо";
         }
@@ -56,7 +57,7 @@ public partial class WorkerPage : UserControl
     {
         try
         {
-            var allTasks = await _supabaseService.GetAllTasksByEmployeeId(_employee.Id);
+            var allTasks = await _workerRepository.GetAllTasksByEmployeeId(_employee.Id);
             _tasks = allTasks?.Select(t => new TaskViewModel
             {
                 Id = t.Id,
@@ -105,7 +106,7 @@ public partial class WorkerPage : UserControl
 
         try
         {
-            await _supabaseService.UpdateTaskWorker(selectedTask.Id, nextStatus);
+            await _workerRepository.UpdateTaskWorker(selectedTask.Id, nextStatus);
             await LoadTasksAsync();
         }
         catch (Exception ex)
@@ -118,7 +119,7 @@ public partial class WorkerPage : UserControl
     {
         var result = MessageBox.Show("Ви впевнені, що хочете вийти?", "Підтвердження", MessageBoxButton.YesNo);
         if (result != MessageBoxResult.Yes) return;
-        _ = _supabaseService.Logout();
+        _ = _workerRepository.Logout();
         var mainWindow = (MainWindow)Application.Current.MainWindow;
         mainWindow?.MainWindowFrame.Navigate(new LoginPage());
     }

@@ -145,7 +145,7 @@ public partial class ManagerPage : UserControl
             reportLines.Add("-------------------------");
             reportLines.Add(""); // Extra line for separation
     
-            // Get project directory
+            // Get a project directory
             var projectDir = AppDomain.CurrentDomain.BaseDirectory;
             var reportDir = Path.Combine(projectDir, "manager's_report");
             Directory.CreateDirectory(reportDir);

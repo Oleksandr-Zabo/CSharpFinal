@@ -16,10 +16,18 @@ public partial class AdminPage : UserControl
 
     public AdminPage(Employees employee, AdminRepositoryImpl? repository)
     {
-        InitializeComponent();
-        _admin = employee ?? throw new ArgumentNullException(nameof(employee));
-        _adminRepository = repository ?? throw new ArgumentNullException(nameof(repository));
-        Loaded += AdminPage_Loaded;
+        try
+        {
+            InitializeComponent();// TO-DO: InitializeComponent create error
+            _admin = employee ?? throw new ArgumentNullException(nameof(employee));
+            _adminRepository = repository ?? throw new ArgumentNullException(nameof(repository));
+            Loaded += AdminPage_Loaded;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Помилка ініціалізації сторінки: " + ex.Message);
+            throw;
+        }
     }
 
     private async void AdminPage_Loaded(object sender, RoutedEventArgs e)
@@ -121,7 +129,7 @@ public partial class AdminPage : UserControl
     {
         var result = MessageBox.Show("Ви впевнені, що хочете вийти?", "Підтвердження", MessageBoxButton.YesNo);
         if (result != MessageBoxResult.Yes) return;
-        //logout from repository if needed
+        //logout from the repository if needed
         _ = _adminRepository.Logout();
         var mainWindow = (MainWindow)Application.Current.MainWindow;
         mainWindow?.MainWindowFrame.Navigate(new LoginPage());

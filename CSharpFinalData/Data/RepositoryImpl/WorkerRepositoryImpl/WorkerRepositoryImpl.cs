@@ -5,9 +5,14 @@ using CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
 namespace CSharpFinalData.Data.RepositoryImpl.WorkerRepositoryImpl;
 
-public class WorkerRepositoryImpl(SupabaseService supabaseService) : WorkerRepository
+public class WorkerRepositoryImpl: WorkerRepository
 {
-    private readonly SupabaseService _supabaseService = supabaseService ?? throw new ArgumentNullException(nameof(supabaseService), "SupabaseService cannot be null");
+    private readonly SupabaseService _supabaseService;
+
+    public WorkerRepositoryImpl(SupabaseService supabaseService)
+    {
+        _supabaseService = supabaseService ?? throw new ArgumentNullException(nameof(supabaseService), "SupabaseService cannot be null");
+    }
 
     public override async Task<bool> UpdateTaskWorker(int taskId, string taskStatus)
     {

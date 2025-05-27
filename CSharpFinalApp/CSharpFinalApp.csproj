@@ -36,4 +36,6 @@
       <None Remove="Assets\Images\chef.png" />
     </ItemGroup>
 
+    <!-- Removed explicit Page includes to avoid duplicate 'Page' items error -->
+
 </Project>

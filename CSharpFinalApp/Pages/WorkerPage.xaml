@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
-             d:DesignHeight="800" d:DesignWidth="800" MinHeight="750" MinWidth="750">
+             d:DesignHeight="800" d:DesignWidth="800" MinHeight="800" MinWidth="750">
     <UserControl.Background>
         <LinearGradientBrush>
             <GradientStop Color="#CE9FFC" Offset="0.0" />
@@ -45,16 +45,16 @@
                                 <Image Source="/Assets/Images/worker.png" Width="60" Height="60" Margin="0 0 20 0"/>
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Ім'я: " FontSize="16" FontWeight="Bold" Foreground="Azure"/>
-                                        <TextBlock x:Name="WorkerNameText" FontSize="16" FontWeight="Bold" Foreground="#222"/>
+                                        <TextBlock Text="Ім'я:  " FontSize="16" FontWeight="Bold" Foreground="Azure" Margin=" 0 0 10 0"/>
+                                        <TextBlock x:Name="WorkerNameText" FontSize="16" FontWeight="Bold" Foreground="Azure"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Email: " FontSize="14" FontWeight="Bold" Foreground="Azure"/>
-                                        <TextBlock x:Name="WorkerEmailText" FontSize="14" Foreground="#222"/>
+                                        <TextBlock Text="Email: " FontSize="14" FontWeight="Bold" Foreground="Azure" Margin=" 0 0 10 0"/>
+                                        <TextBlock x:Name="WorkerEmailText" FontSize="14" Foreground="Azure"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Роль: " FontSize="14" FontWeight="Bold" Foreground="Azure"/>
-                                        <TextBlock x:Name="WorkerRoleText" FontSize="14" Foreground="#222"/>
+                                        <TextBlock Text="Роль:  " FontSize="14" FontWeight="Bold" Foreground="Azure" Margin=" 0 0 10 0"/>
+                                        <TextBlock x:Name="WorkerRoleText" FontSize="14" Foreground="Azure"/>
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>

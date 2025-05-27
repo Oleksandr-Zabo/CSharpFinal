@@ -18,7 +18,7 @@ public partial class AdminPage : UserControl
     {
         try
         {
-            InitializeComponent();// TO-DO: InitializeComponent create error
+            InitializeComponent();
             _admin = employee ?? throw new ArgumentNullException(nameof(employee));
             _adminRepository = repository ?? throw new ArgumentNullException(nameof(repository));
             Loaded += AdminPage_Loaded;

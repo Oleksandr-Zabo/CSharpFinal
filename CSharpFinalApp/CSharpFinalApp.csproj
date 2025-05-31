@@ -36,6 +36,8 @@
       <None Remove="Assets\Images\chef.png" />
       <None Remove="Assets\Images\worker.png" />
       <Resource Include="Assets\Images\worker.png" />
+      <None Remove="Assets\Images\SplashImage.png" />
+      <Resource Include="Assets\Images\SplashImage.png" />
     </ItemGroup>
 
     <!-- Removed explicit Page includes to avoid duplicate 'Page' items error -->

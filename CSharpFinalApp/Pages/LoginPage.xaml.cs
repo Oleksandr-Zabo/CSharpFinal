@@ -31,7 +31,7 @@ public partial class LoginPage : UserControl
             var user = await loginRepository.LoginAsync(email, password);
             var employee = await loginRepository.GetEmployeeByUserAsync(email, password);
 
-            MessageBox.Show("Login successful!");
+            MessageBox.Show("Вхід успішний!");
             var mainWindow = (MainWindow)Application.Current.MainWindow;
 
             switch (employee.RoleId)

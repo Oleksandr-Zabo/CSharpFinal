@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSharpFinal"
         mc:Ignorable="d"
-        Title="Restaurant Management App" Height="920" Width="800" MinWidth="900" MinHeight="650"
+        Title="Restaurant Management App" Width="920" Height="800" MinWidth="900" MinHeight="650"
         WindowStartupLocation="CenterScreen"
-        WindowState="Maximized" Icon="pack://application:,,,/Assets/Icon/logo.ico" Background="Transparent"
+        WindowState="Maximized" Icon="pack://application:,,,/Assets/Icon/logo.ico" Background="Azure"
         Loaded="MainWindow_OnLoaded">
     <Grid>
         <Frame x:Name="MainWindowFrame" NavigationUIVisibility="Hidden"></Frame>

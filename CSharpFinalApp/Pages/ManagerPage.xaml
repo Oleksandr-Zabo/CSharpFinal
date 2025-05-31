@@ -106,17 +106,32 @@
                             <TextBlock Text="Оновити завдання" VerticalAlignment="Center" Foreground="Azure"/>
                         </StackPanel>
                     </Button>
-                    <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 10 0 0"
-                            FontSize="14"
-                            Height="40" Width="200"
-                            Foreground="Azure"
-                            Style="{StaticResource MaterialDesignRaisedButton}"
-                            Click="OnCreateReportClick">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <materialDesign:PackIcon Kind="FileDocument" Width="20" Height="20" Foreground="Azure" Margin="0,0,8,0"/>
-                            <TextBlock Text="Створити звіт" VerticalAlignment="Center" Foreground="Azure"/>
-                        </StackPanel>
-                    </Button>
+                    <!-- Buttons: Створити звіт and Видалити виконані завдання side by side -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                        <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 10 0 0"
+                                FontSize="14"
+                                Height="40" Width="200"
+                                Foreground="Azure"
+                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                Click="OnCreateReportClick">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="FileDocument" Width="20" Height="20" Foreground="Azure" Margin="0,0,8,0"/>
+                                <TextBlock Text="Створити звіт" VerticalAlignment="Center" Foreground="Azure"/>
+                            </StackPanel>
+                        </Button>
+                        <!-- New Button: Видалити виконані завдання (to the right) -->
+                        <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 10 0 0"
+                                FontSize="14"
+                                Height="40" Width="200"
+                                Foreground="Azure"
+                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                Click="OnDeleteFinishedTasksClick">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="DeleteSweep" Width="20" Height="20" Foreground="Azure" Margin="0,0,8,0"/>
+                                <TextBlock Text="Видалити виконані" VerticalAlignment="Center" Foreground="Azure"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
             </materialDesign:Card>
         </StackPanel>
@@ -128,5 +143,3 @@
                HorizontalAlignment="Stretch"/>
     </Grid>
 </UserControl>
-
-

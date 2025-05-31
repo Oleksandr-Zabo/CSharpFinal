@@ -296,7 +296,8 @@ public class SupabaseService
         }
     }
     
-    // for Role: Worker - get all tasks by employeeId
+    // for Role: Manager - get all tasks
+    
     public async Task<List<TasksModel>?> GetAllTasksByEmployeeId(int employeeId)
     {
         try
@@ -310,6 +311,25 @@ public class SupabaseService
             throw new Exception($"GetAllTasksByEmployeeId(int employeeId) raise Exception: {ex.Message}");
         }
     }
+    
+    // for Role: Worker - delete all Finished tasks
+    public async Task<bool> DeleteAllFinishedTasksAsync()
+    {
+        try
+        {
+            await _client
+                .From<TasksModel>()
+                .Where(task => task.Status == "Finished")
+                .Delete();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"DeleteAllFinishedTasksAsync() raise Exception: {ex.Message}");
+        }
+    }
+    
     
     // for Role: Worker- update task
     public async Task<bool> UpdateTaskWorker(int taskId, string taskStatus)

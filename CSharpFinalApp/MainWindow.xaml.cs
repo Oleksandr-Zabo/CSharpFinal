@@ -19,7 +19,7 @@ public partial class MainWindow : Window
     
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
-        // Navigate to the initial page (e.g., LoginPage) when the window is loaded
-        MainWindowFrame.NavigationService?.Navigate(new Pages.LoginPage());
+        // Navigate to the initial page (e.g., SplashWindow) when the window is loaded
+        MainWindowFrame.NavigationService?.Navigate(new Pages.SplashWindow());
     }
 }

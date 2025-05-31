@@ -162,6 +162,29 @@ public partial class ManagerPage : UserControl
         }
     }
 
+    private async void OnDeleteFinishedTasksClick(object sender, RoutedEventArgs e)
+    {
+        var result = MessageBox.Show("Ви впевнені, що хочете видалити всі виконані завдання?", "Підтвердження", MessageBoxButton.YesNo);
+        if (result != MessageBoxResult.Yes) return;
+        try
+        {
+            var success = await _managerRepository.DeleteAllFinishedTasksAsync();
+            if (success)
+            {
+                MessageBox.Show("Всі виконані завдання видалено.");
+                await LoadTasksAsync();
+            }
+            else
+            {
+                MessageBox.Show("Не вдалося видалити виконані завдання.");
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Помилка при видаленні виконаних завдань: " + ex.Message);
+        }
+    }
+
     // View model for DataGrid
     private class TaskViewModel
     {

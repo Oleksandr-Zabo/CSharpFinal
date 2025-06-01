@@ -114,11 +114,19 @@ public partial class ManagerPage : UserControl
         await LoadTasksAsync();
     }
 
-    private void OnLogoutClick(object sender, RoutedEventArgs e)
+    private async void OnLogoutClick(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show("Ви впевнені, що хочете вийти?", "Підтвердження", MessageBoxButton.YesNo);
         if (result != MessageBoxResult.Yes) return;
-        _ = _managerRepository.Logout();
+        try
+        {
+            await _managerRepository.Logout();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Помилка при виході: " + ex.Message);
+            return;
+        }
         var mainWindow = (MainWindow)Application.Current.MainWindow;
         mainWindow?.MainWindowFrame.Navigate(new LoginPage());
     }

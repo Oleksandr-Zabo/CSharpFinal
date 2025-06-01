@@ -125,12 +125,19 @@ public partial class AdminPage : UserControl
         }
     }
 
-    private void OnLogoutClick(object sender, RoutedEventArgs e)
+    private async void OnLogoutClick(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show("Ви впевнені, що хочете вийти?", "Підтвердження", MessageBoxButton.YesNo);
         if (result != MessageBoxResult.Yes) return;
-        //logout from the repository if needed
-        _ = _adminRepository.Logout();
+        try
+        {
+            await _adminRepository.Logout();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Помилка при виході: " + ex.Message);
+            return;
+        }
         var mainWindow = (MainWindow)Application.Current.MainWindow;
         mainWindow?.MainWindowFrame.Navigate(new LoginPage());
     }

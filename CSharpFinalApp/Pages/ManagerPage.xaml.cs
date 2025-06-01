@@ -96,7 +96,7 @@ public partial class ManagerPage : UserControl
 
         try
         {
-            await _managerRepository.CreateTaskAsync(selectedWorker.Id, description, deadline, "new");
+            await _managerRepository.CreateTaskAsync(selectedWorker.Id, description, deadline, "New");
             MessageBox.Show("Завдання додано!");
             TaskDescriptionTextBox.Text = "";
             DeadlineDatePicker.SelectedDate = null;

@@ -160,7 +160,7 @@ public partial class ManagerPage : UserControl
     
             var filePath = Path.Combine(reportDir, "manager_report.txt");
     
-            await File.AppendAllLinesAsync(filePath, reportLines);
+            await File.WriteAllLinesAsync(filePath, reportLines);
     
             MessageBox.Show($"Звіт додано до файлу:\n{filePath}");
         }

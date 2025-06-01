@@ -73,7 +73,8 @@ public class AdminRepositoryImpl(SupabaseService supabaseService) : AdminReposit
         }
         catch (Exception ex)
         {
-            throw new Exception($"Logout() raised an exception: {ex.Message}");
+            Console.WriteLine($"Logout() raised an exception: {ex.Message}");
+            throw;
         }
     }
 }

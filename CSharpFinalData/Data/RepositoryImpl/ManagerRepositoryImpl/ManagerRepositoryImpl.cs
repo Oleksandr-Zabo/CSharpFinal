@@ -54,4 +54,39 @@ public class ManagerRepositoryImpl(SupabaseService supabaseService) : ManagerRep
             throw new Exception($"GetAllTasksAsync() raised an exception: {ex.Message}");
         }
     }
+
+    public override Task<bool> DeleteAllFinishedTasksAsync()
+    {
+        if (_supabaseService == null)
+        {
+            return Task.FromResult(false);
+        }
+    
+        try
+        {
+            return _supabaseService.DeleteAllFinishedTasksAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"DeleteAllFinishedTasksAsync() raised an exception: {ex.Message}");
+        }
+    }
+
+    public async Task Logout()
+    {
+        if (_supabaseService == null)
+        {
+            return;
+        }
+        try
+        {
+            await _supabaseService.LogoutAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Logout() raised an exception: {ex.Message}");
+        }
+    }
+    
+    
 }

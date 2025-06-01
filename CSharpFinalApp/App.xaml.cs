@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using System.Data;
 using System.Windows;
+using CSharpFinal.Pages;
 
 namespace CSharpFinal;
 
@@ -9,4 +10,5 @@ namespace CSharpFinal;
 /// </summary>
 public partial class App : Application
 {
+
 }

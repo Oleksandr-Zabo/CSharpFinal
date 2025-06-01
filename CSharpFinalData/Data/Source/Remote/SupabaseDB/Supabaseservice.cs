@@ -10,7 +10,6 @@ namespace CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
 public class SupabaseService
 {
-    
     private const string SupabaseUrl = "https://blsbwhilzmlhlhxywfpl.supabase.co";
     private const string SupabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsc2J3aGlsem1saGxoeHl3ZnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU5NDg0MTYsImV4cCI6MjA2MTUyNDQxNn0.QN24DqtBr6wFqHNyAYw-XOoHGxbxx0fneOoDJxFsDHo";
     
@@ -20,6 +19,8 @@ public class SupabaseService
         
     public bool IsLoggedIn { get; set; } = false;
         
+    private static SupabaseService? _instance;//for pattern Singleton
+    private static readonly object Lock = new();
     public SupabaseService()
     {
         try
@@ -36,6 +37,17 @@ public class SupabaseService
         }
     }
         
+    public static SupabaseService Instance// Singleton pattern
+    {
+        get
+        {
+            lock (Lock)
+            {
+                return _instance ??= new SupabaseService();
+            }
+        }
+    }
+    
     public async Task InitServiceAsync()
     {
         try
@@ -80,7 +92,7 @@ public class SupabaseService
         }
     }
             
-    public async Task Logout()
+    public async Task LogoutAsync()
     {
         try
         {
@@ -105,6 +117,21 @@ public class SupabaseService
         catch (Exception ex)
         {
             throw new Exception($"GetEmployeeByUser(string email, string password) raise Exception: {ex.Message}");
+        }
+    }
+    
+    // for Role: Admin - is employee by email
+    public async Task<bool> IsEmployeeByEmail(string email)
+    {
+        try
+        {
+            var result = await _client.From<EmployeesModel>().Get();
+            var employee = result.Models.FirstOrDefault(e => e.Email == email);
+            return employee != null;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"IsEmployeeByEmail(string email) raise Exception: {ex.Message}");
         }
     }
     
@@ -269,7 +296,8 @@ public class SupabaseService
         }
     }
     
-    // for Role: Worker - get all tasks by employeeId
+    // for Role: Manager - get all tasks
+    
     public async Task<List<TasksModel>?> GetAllTasksByEmployeeId(int employeeId)
     {
         try
@@ -284,17 +312,48 @@ public class SupabaseService
         }
     }
     
+    // for Role: Worker - delete all Finished tasks
+    public async Task<bool> DeleteAllFinishedTasksAsync()
+    {
+        try
+        {
+            await _client
+                .From<TasksModel>()
+                .Where(task => task.Status == "Finished")
+                .Delete();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"DeleteAllFinishedTasksAsync() raise Exception: {ex.Message}");
+        }
+    }
+    
+    
     // for Role: Worker- update task
     public async Task<bool> UpdateTaskWorker(int taskId, string taskStatus)
     {
         try
         {
-            var result = await _client
+            // Fetch the existing task
+            var getResult = await _client
                 .From<TasksModel>()
                 .Where(x => x.Id == taskId)
-                .Update(new TasksModel { Status = taskStatus });
-    
-            return result.Models.Count > 0; // Success if at least one record is updated
+                .Single();
+
+            if (getResult == null)
+                throw new Exception("Task not found.");
+
+            getResult.Status = taskStatus;
+
+            var updateResult = await _client
+                .From<TasksModel>()
+                .Where(x => x.Id == taskId)
+                .Update(getResult);
+
+            bool finalResult = updateResult.Models.Count > 0;
+            return finalResult;
         }
         catch (Exception ex)
         {

@@ -50,5 +50,30 @@ public class AdminRepositoryImpl(SupabaseService supabaseService) : AdminReposit
             Task.FromResult(false));
     }
 
+    public override async Task<bool> IsUserByEmailAsync(string email)
+    {
+        if (_supabaseService == null)
+        {
+            return false;
+        }
     
+        return await _supabaseService.IsEmployeeByEmail(email);
+    }
+
+    public async Task Logout()
+    {
+        if (_supabaseService == null)
+        {
+            return;
+        }
+        try
+        {
+            await _supabaseService.LogoutAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Logout() raised an exception: {ex.Message}");
+            throw;
+        }
+    }
 }

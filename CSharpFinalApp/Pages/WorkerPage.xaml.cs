@@ -35,8 +35,6 @@ public partial class WorkerPage : UserControl
     {
         WorkerNameText.Text = _employee.Name;
         WorkerEmailText.Text = _employee.Email;
-        _roleName = await GetRoleNameAsync(_employee.RoleId);
-        
         _roleName = _employee.RoleId switch
         {
             2 => "Офіціант", // Waiter

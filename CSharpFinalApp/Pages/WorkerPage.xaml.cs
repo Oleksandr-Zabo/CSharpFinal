@@ -122,13 +122,20 @@ public partial class WorkerPage : UserControl
         }
     }
 
-    private void OnLogoutClick(object sender, RoutedEventArgs e)
+    private async void OnLogoutClick(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show("Ви впевнені, що хочете вийти?", "Підтвердження", MessageBoxButton.YesNo);
         if (result != MessageBoxResult.Yes) return;
-        _ = _workerRepository.Logout();
-        var mainWindow = (MainWindow)Application.Current.MainWindow;
-        mainWindow?.MainWindowFrame.Navigate(new LoginPage());
+        try
+        {
+            await _workerRepository.Logout();
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow?.MainWindowFrame.Navigate(new LoginPage());
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Помилка при виході: " + ex.Message);
+        }
     }
 
     private class TaskViewModel

@@ -57,7 +57,8 @@ public class AdminRepositoryImpl(SupabaseService supabaseService) : AdminReposit
             return false;
         }
     
-        return await _supabaseService.IsEmployeeByEmail(email)!;
+        var isEmployee = await _supabaseService.IsEmployeeByEmail(email);
+        return isEmployee ?? false;
     }
 
     public async Task Logout()

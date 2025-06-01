@@ -113,8 +113,16 @@ public partial class WorkerPage : UserControl
 
         try
         {
-            await _workerRepository.UpdateTaskWorker(selectedTask.Id, nextStatus);
-            await LoadTasksAsync();
+         var updateResult = await _workerRepository.UpdateTaskWorker(selectedTask.Id, nextStatus);
+         if (updateResult)
+         {
+             MessageBox.Show($@"Завдання оновлено до статусу: {nextStatus}");
+         }
+         else
+         {
+             MessageBox.Show("Не вдалося оновити завдання.");
+         }
+         await LoadTasksAsync();
         }
         catch (Exception ex)
         {

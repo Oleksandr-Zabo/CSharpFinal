@@ -19,7 +19,8 @@ public class WorkerRepositoryImpl: WorkerRepository
         try
         {
             await _supabaseService.InitServiceAsync();
-            return await _supabaseService.UpdateTaskWorker(taskId, taskStatus);
+            var result= await _supabaseService.UpdateTaskWorker(taskId, taskStatus);
+            return result;
         }
         catch (Exception ex)
         {

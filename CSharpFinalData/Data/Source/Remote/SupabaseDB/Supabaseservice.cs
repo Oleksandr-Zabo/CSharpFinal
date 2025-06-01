@@ -336,12 +336,24 @@ public class SupabaseService
     {
         try
         {
-            var result = await _client
+            // Fetch the existing task
+            var getResult = await _client
                 .From<TasksModel>()
                 .Where(x => x.Id == taskId)
-                .Update(new TasksModel { Status = taskStatus });
-    
-            return result.Models.Count > 0; // Success if at least one record is updated
+                .Single();
+
+            if (getResult == null)
+                throw new Exception("Task not found.");
+
+            getResult.Status = taskStatus;
+
+            var updateResult = await _client
+                .From<TasksModel>()
+                .Where(x => x.Id == taskId)
+                .Update(getResult);
+
+            bool finalResult = updateResult.Models.Count > 0;
+            return finalResult;
         }
         catch (Exception ex)
         {

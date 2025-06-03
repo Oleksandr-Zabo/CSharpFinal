@@ -1,0 +1,46 @@
+@startuml
+left to right direction
+actor User
+actor Admin
+actor Manager
+actor Worker
+
+package "Restaurant(App)" {
+  package "User Management" {
+    Admin -[#red]-> (Add Employee)
+    Admin -[#red]-> (Delete Employee)
+    Admin -[#red]-> (View Employees)
+    Admin -[#red]-> (Logout)
+    Admin -[#red]-> (Manage Users)
+    Admin -[#red]-> Manager : manages
+    Admin -[#red]-> Worker : manages
+  }
+
+  package "Task Management" {
+    Manager -[#blue]-> (Add Task)
+    Manager -[#blue]-> (View Tasks)
+    Manager -[#blue]-> (Create Report)
+    Manager -[#blue]-> (Delete Finished Tasks)
+    Manager -[#blue]-> (Logout)
+    Manager -[#blue]-> Worker : assigns tasks
+
+    Worker -[#green]-> (View Tasks)
+    Worker -[#green]-> (Update Task Status)
+    Worker -[#green]-> (Logout)
+    Worker -[#green]-> (Do Task)
+  }
+
+  User -[#orange]-> (Login)
+  User -[#orange]-> Admin : login as
+  User -[#orange]-> Manager : login as
+  User -[#orange]-> Worker : login as
+}
+
+' Notes
+note right of Admin : Admin can manage only Manager and Worker, not other Admins
+note right of Manager : Manager can assign tasks to Worker, but cannot update tasks
+note right of Worker : Worker can view, update status, and do tasks
+note right of User : User can login as Admin, Manager, or Worker
+
+@enduml
+

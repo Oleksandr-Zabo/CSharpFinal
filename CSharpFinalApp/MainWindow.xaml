@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSharpFinal"
         mc:Ignorable="d"
-        Title="Restaurant Management App" Width="920" Height="800" MinWidth="900" MinHeight="650"
+        Title="Restaurant Management App" MinWidth="950" MinHeight="750"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized" Icon="pack://application:,,,/Assets/Icon/logo.ico" Background="Azure"
         Loaded="MainWindow_OnLoaded">

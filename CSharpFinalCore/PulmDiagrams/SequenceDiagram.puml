@@ -1,0 +1,41 @@
+@startuml
+'autonumber
+actor User
+participant LoginPage
+participant AdminPage
+participant ManagerPage
+participant WorkerPage
+participant AuthService
+participant EmployeeRepository
+participant TaskRepository
+
+== User Login ==
+User -> LoginPage: Enter credentials
+LoginPage -> AuthService: Authenticate (username, password)
+AuthService -> EmployeeRepository: Get user by credentials
+EmployeeRepository --> AuthService: User data
+AuthService --> LoginPage: Auth result (role)
+LoginPage --> User: Show main page (by role)
+
+== Admin adds employee ==
+User -> AdminPage: Add employee data
+AdminPage -> AuthService: Validate admin
+AdminPage -> EmployeeRepository: Add employee
+EmployeeRepository --> AdminPage: Add result
+AdminPage --> User: Show success/fail
+
+== Manager assigns task ==
+User -> ManagerPage: Add task data
+ManagerPage -> AuthService: Validate manager
+ManagerPage -> TaskRepository: Add task
+TaskRepository --> ManagerPage: Add result
+ManagerPage --> User: Show success/fail
+
+== Worker updates task ==
+User -> WorkerPage: Update task status
+WorkerPage -> AuthService: Validate worker
+WorkerPage -> TaskRepository: Update task status
+TaskRepository --> WorkerPage: Update result
+WorkerPage --> User: Show success/fail
+@enduml
+

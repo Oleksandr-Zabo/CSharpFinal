@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
-             d:DesignHeight="750" d:DesignWidth="820" MinHeight="800" MinWidth="750">
+             d:DesignHeight="770" d:DesignWidth="820" MinWidth="750">
     <UserControl.Background>
         <LinearGradientBrush>
             <GradientStop Color="#CE9FFC" Offset="0.0" />
@@ -17,64 +17,35 @@
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <!-- Admin Card (Left) -->
-        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="30">
-            <materialDesign:Card
-                materialDesign:UniformCornerRadius="20"
-                materialDesign:ElevationAssist.Elevation="Dp16"
-                MaxWidth="630" MaxHeight="700" MinHeight="650" MinWidth="400" Padding="24">
-                <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" >
-                    <!-- Logout Button at the top -->
-                    <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 20 0 0"
-                            FontSize="14"
-                            Height="40" Width="200"
-                            HorizontalAlignment="Left"
-                            Foreground="Azure"
-                            Style="{StaticResource MaterialDesignRaisedButton}"
-                            Click="OnLogoutClick">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <materialDesign:PackIcon Kind="Logout" Width="20" Height="20" Foreground="Azure" Margin="0,0,8,0"/>
-                            <TextBlock Text="Вийти" VerticalAlignment="Center" Foreground="Azure"/>
-                        </StackPanel>
-                    </Button>
-                    <TextBlock Text="Додавання працівника" FontSize="22" Padding="0 10 0 10"
-                               FontWeight="Bold" Foreground="Azure" HorizontalAlignment="Center" Margin="0 0 0 10"/>
-                    <StackPanel Orientation="Vertical" Margin="0 0 0 10" >
-                        <!-- Name -->
-                        <DockPanel Margin="0 5 0 5" LastChildFill="True">
-                            <materialDesign:PackIcon Kind="Account" Width="24" Height="24" Foreground="Azure" Margin="0 0 10 0" VerticalAlignment="Center"/>
-                            <TextBox x:Name="NameTextBox" FontSize="15" Height="36"
-                                     materialDesign:HintAssist.Hint="Ім'я"
-                                     materialDesign:HintAssist.Foreground="Azure"
-                                     Foreground="Azure"
-                                     Background="Transparent"
-                                     BorderBrush="Azure"
-                                     BorderThickness="1"
-                                     Padding="8,0,8,0"
-                                     VerticalContentAlignment="Center"
-                                     FontWeight="SemiBold"
-                                     Margin="0"/>
-                        </DockPanel>
-                        <!-- Email -->
-                        <DockPanel Margin="0 5 0 5" LastChildFill="True">
-                            <materialDesign:PackIcon Kind="Email" Width="24" Height="24" Foreground="Azure" Margin="0 0 10 0" VerticalAlignment="Center"/>
-                            <TextBox x:Name="EmailTextBox" FontSize="15" Height="36"
-                                     materialDesign:HintAssist.Hint="Email"
-                                     materialDesign:HintAssist.Foreground="Azure"
-                                     Foreground="Azure"
-                                     Background="Transparent"
-                                     BorderBrush="Azure"
-                                     BorderThickness="1"
-                                     Padding="8,0,8,0"
-                                     VerticalContentAlignment="Center"
-                                     FontWeight="SemiBold"
-                                     Margin="0"/>
-                        </DockPanel>
-                        <!-- Password -->
-                        <DockPanel Margin="0 5 0 5" LastChildFill="True">
-                            <materialDesign:PackIcon Kind="Lock" Width="24" Height="24" Foreground="Azure" Margin="0 0 10 0" VerticalAlignment="Center"/>
-                            <PasswordBox x:Name="PasswordBox" FontSize="15" Height="36"
-                                         materialDesign:HintAssist.Hint="Пароль"
+        <!-- Admin Card (Left) with scroll if needed -->
+        <Grid Grid.Column="0" VerticalAlignment="Stretch" Margin="30">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <materialDesign:Card
+                    materialDesign:UniformCornerRadius="20"
+                    materialDesign:ElevationAssist.Elevation="Dp16"
+                    MaxWidth="630" MinWidth="400" Padding="24" VerticalAlignment="Top" Height="700">
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
+                        <!-- Logout Button at the top -->
+                        <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 20 0 0"
+                                FontSize="14"
+                                Height="40" Width="200"
+                                HorizontalAlignment="Left"
+                                Foreground="Azure"
+                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                Click="OnLogoutClick">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="Logout" Width="20" Height="20" Foreground="Azure" Margin="0,0,8,0"/>
+                                <TextBlock Text="Вийти" VerticalAlignment="Center" Foreground="Azure"/>
+                            </StackPanel>
+                        </Button>
+                        <TextBlock Text="Додавання працівника" FontSize="22" Padding="0 10 0 10"
+                                   FontWeight="Bold" Foreground="Azure" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                        <StackPanel Orientation="Vertical" Margin="0 0 0 10" >
+                            <!-- Name -->
+                            <DockPanel Margin="0 5 0 5" LastChildFill="True">
+                                <materialDesign:PackIcon Kind="Account" Width="24" Height="24" Foreground="Azure" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                                <TextBox x:Name="NameTextBox" FontSize="15" Height="36"
+                                         materialDesign:HintAssist.Hint="Ім'я"
                                          materialDesign:HintAssist.Foreground="Azure"
                                          Foreground="Azure"
                                          Background="Transparent"
@@ -84,53 +55,97 @@
                                          VerticalContentAlignment="Center"
                                          FontWeight="SemiBold"
                                          Margin="0"/>
-                        </DockPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0 5 0 5">
-                            <RadioButton x:Name="AdminRadio" Content="Адмін" FontSize="15" GroupName="Role" Margin="0 0 15 0" Foreground="Azure"/>
-                            <RadioButton x:Name="ManagerRadio" Content="Менеджер" FontSize="15" GroupName="Role" Margin="0 0 15 0" Foreground="Azure"/>
-                            <RadioButton x:Name="WaiterRadio" Content="Офіціант" FontSize="15" GroupName="Role" Margin="0 0 15 0" Foreground="Azure"/>
-                            <RadioButton x:Name="ChefRadio" Content="Шеф-кухар" FontSize="15" GroupName="Role" Foreground="Azure"/>
+                            </DockPanel>
+                            <!-- Email -->
+                            <DockPanel Margin="0 5 0 5" LastChildFill="True">
+                                <materialDesign:PackIcon Kind="Email" Width="24" Height="24" Foreground="Azure" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                                <TextBox x:Name="EmailTextBox" FontSize="15" Height="36"
+                                         materialDesign:HintAssist.Hint="Email"
+                                         materialDesign:HintAssist.Foreground="Azure"
+                                         Foreground="Azure"
+                                         Background="Transparent"
+                                         BorderBrush="Azure"
+                                         BorderThickness="1"
+                                         Padding="8,0,8,0"
+                                         VerticalContentAlignment="Center"
+                                         FontWeight="SemiBold"
+                                         Margin="0"/>
+                            </DockPanel>
+                            <!-- Password -->
+                            <DockPanel Margin="0 5 0 5" LastChildFill="True">
+                                <materialDesign:PackIcon Kind="Lock" Width="24" Height="24" Foreground="Azure" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                                <PasswordBox x:Name="PasswordBox" FontSize="15" Height="36"
+                                             materialDesign:HintAssist.Hint="Пароль"
+                                             materialDesign:HintAssist.Foreground="Azure"
+                                             Foreground="Azure"
+                                             Background="Transparent"
+                                             BorderBrush="Azure"
+                                             BorderThickness="1"
+                                             Padding="8,0,8,0"
+                                             VerticalContentAlignment="Center"
+                                             FontWeight="SemiBold"
+                                             Margin="0"/>
+                            </DockPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0 5 0 5">
+                                <RadioButton x:Name="AdminRadio" Content="Адмін" FontSize="15" GroupName="Role" Margin="0 0 15 0" Foreground="Azure"/>
+                                <RadioButton x:Name="ManagerRadio" Content="Менеджер" FontSize="15" GroupName="Role" Margin="0 0 15 0" Foreground="Azure"/>
+                                <RadioButton x:Name="WaiterRadio" Content="Офіціант" FontSize="15" GroupName="Role" Margin="0 0 15 0" Foreground="Azure"/>
+                                <RadioButton x:Name="ChefRadio" Content="Шеф-кухар" FontSize="15" GroupName="Role" Foreground="Azure"/>
+                            </StackPanel>
+                            <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 10 0 0"
+                                    FontSize="14"
+                                    Height="40" Width="200"
+                                    Foreground="Azure"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Click="OnAddEmployeeClick">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <materialDesign:PackIcon Kind="AccountPlus" Width="20" Height="20" Foreground="Azure" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Додати працівника" VerticalAlignment="Center" Foreground="Azure"/>
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
-                        <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 10 0 0"
+                        <Separator Margin="0 10 0 10"/>
+                        <TextBlock Text="Список працівників" FontSize="18" FontWeight="Bold" Foreground="Azure" Margin="0 0 0 5"/>
+                        <Border BorderBrush="Azure" BorderThickness="2" CornerRadius="8" Background="#23272E" Margin="0 0 0 10">
+                            <StackPanel>
+                                <!-- Header row inside the table -->
+                                <Grid Margin="8,4,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                                <ListBox x:Name="EmployeesListBox" Height="120"
+                                         SelectedValuePath="Id"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                         Background="#23272E"
+                                         Foreground="Azure"
+                                         BorderThickness="0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}" Foreground="Azure" FontWeight="SemiBold" Grid.Column="0"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                        </Border>
+                        <!-- Delete Button at the bottom -->
+                        <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 15 0 0"
                                 FontSize="14"
-                                Height="40" Width="200"
+                                Height="40" Width="220"
                                 Foreground="Azure"
                                 Style="{StaticResource MaterialDesignRaisedButton}"
-                                Click="OnAddEmployeeClick">
+                                Click="OnDeleteEmployeeClick"
+                                IsEnabled="True">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <materialDesign:PackIcon Kind="AccountPlus" Width="20" Height="20" Foreground="Azure" Margin="0,0,8,0"/>
-                                <TextBlock Text="Додати працівника" VerticalAlignment="Center" Foreground="Azure"/>
+                                <materialDesign:PackIcon Kind="AccountRemove" Width="20" Height="20" Foreground="Azure" Margin="0,0,8,0"/>
+                                <TextBlock Text="Видалити працівника" VerticalAlignment="Center" Foreground="Azure"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
-                    <Separator Margin="0 10 0 10"/>
-                    <TextBlock Text="Список працівників" FontSize="18" FontWeight="Bold" Foreground="Azure" Margin="0 0 0 5"/>
-                    <Border BorderBrush="Azure" BorderThickness="2" CornerRadius="8" Background="#23272E" Margin="0 0 0 10">
-                        <ListBox x:Name="EmployeesListBox" Height="120"
-                                 DisplayMemberPath="Name"
-                                 SelectedValuePath="Id"
-                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                 Background="#23272E"
-                                 Foreground="Azure"
-                                 BorderThickness="0"
-                                 />
-                    </Border>
-                    <!-- Delete Button at the bottom -->
-                    <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 15 0 0"
-                            FontSize="14"
-                            Height="40" Width="200"
-                            Foreground="Azure"
-                            Style="{StaticResource MaterialDesignRaisedButton}"
-                            Click="OnDeleteEmployeeClick"
-                            IsEnabled="True">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <materialDesign:PackIcon Kind="AccountRemove" Width="20" Height="20" Foreground="Azure" Margin="0,0,8,0"/>
-                            <TextBlock Text="Видалити працівника" VerticalAlignment="Center" Foreground="Azure"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </materialDesign:Card>
-        </StackPanel>
+                </materialDesign:Card>
+            </ScrollViewer>
+        </Grid>
         <!-- Image (Right) -->
         <Image Grid.Column="1"
                Source="/Assets/Images/fon.png"
@@ -139,4 +154,3 @@
                HorizontalAlignment="Stretch"/>
     </Grid>
 </UserControl>
-

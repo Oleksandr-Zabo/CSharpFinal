@@ -1,0 +1,48 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+scale 350 width
+[*] --> LoggedOut
+
+state LoggedOut {
+  [*] --> LoginPage
+  LoginPage --> LoggedIn : LoginSuccess
+}
+
+state LoggedIn {
+  [*] --> RoleSelection
+  RoleSelection --> Admin : SelectAdmin
+  RoleSelection --> Manager : SelectManager
+  RoleSelection --> Worker : SelectWorker
+  RoleSelection --> LoggedOut : Logout
+}
+
+state Admin {
+  [*] --> ViewingEmployees
+  ViewingEmployees --> AddingEmployee : AddEmployee
+  AddingEmployee --> ViewingEmployees : EmployeeAdded
+  ViewingEmployees --> DeletingEmployee : DeleteEmployee
+  DeletingEmployee --> ViewingEmployees : EmployeeDeleted
+  ViewingEmployees --> LoggedOut : Logout
+}
+
+state Manager {
+  [*] --> ViewingTasks
+  ViewingTasks --> AddingTask : AddTask
+  AddingTask --> ViewingTasks : TaskAdded
+  ViewingTasks --> CreatingReport : CreateReport
+  CreatingReport --> ViewingTasks : ReportCreated
+  ViewingTasks --> DeletingFinishedTasks : DeleteFinished
+  DeletingFinishedTasks --> ViewingTasks : FinishedDeleted
+  ViewingTasks --> LoggedOut : Logout
+}
+
+state Worker {
+  [*] --> ViewingTasks
+  ViewingTasks --> UpdatingTask : UpdateTaskStatus
+  UpdatingTask --> ViewingTasks : TaskUpdated
+  ViewingTasks --> LoggedOut : Logout
+}
+
+@enduml
+

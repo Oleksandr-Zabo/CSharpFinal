@@ -1,9 +1,13 @@
 using CSharpFinalCore.Core.Entity;
 using CSharpFinalData.Data.Models;
-using Supabase.Gotrue;
+using SupabaseUser = Supabase.Gotrue.User;
 using Client = Supabase.Client;
 using Supabase.Postgrest;
 using static Supabase.Postgrest.Constants;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using Supabase.Gotrue;
 
 namespace CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
@@ -12,10 +16,12 @@ public class SupabaseService
 {
     private const string SupabaseUrl = "https://blsbwhilzmlhlhxywfpl.supabase.co";
     private const string SupabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsc2J3aGlsem1saGxoeHl3ZnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU5NDg0MTYsImV4cCI6MjA2MTUyNDQxNn0.QN24DqtBr6wFqHNyAYw-XOoHGxbxx0fneOoDJxFsDHo";
+    private const string ServiceRoleKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsc2J3aGlsem1saGxoeHl3ZnBsIiwicm9zZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTk0ODQxNiwiZXhwIjoyMDYxNTI0NDE2fQ.dH5PW2YV4vJ7JarMGwWDUlk-NT-5dNc5VxMpRUEmWqQ";
     
     private readonly Supabase.Client _client;
-        
-    public User? SupabaseUser { get; set; } = null;
+    private readonly HttpClient _httpClient;
+
+    public SupabaseUser? SupabaseUser { get; set; } = null;
         
     public bool IsLoggedIn { get; set; } = false;
         
@@ -30,6 +36,8 @@ public class SupabaseService
                 AutoConnectRealtime = true,
             };
             _client = new Client(SupabaseUrl, SupabaseKey, options);
+            _httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ServiceRoleKey);
         }
         catch (Exception ex)
         {
@@ -229,37 +237,86 @@ public class SupabaseService
                 .From<EmployeesModel>()
                 .Where(e => e.Id == employeeId)
                 .Single();
-    
+
             if (employee == null)
             {
                 throw new Exception("Employee not found.");
             }
-    
+
             // Check if the employee is an admin
             var role = await _client
                 .From<RolesModel>()
                 .Where(r => r.Id == employee.RoleId)
                 .Single();
-    
+
             if (role != null && role.RoleName.Equals("Admin", StringComparison.OrdinalIgnoreCase))
             {
                 throw new Exception("Cannot delete an admin employee.");
             }
-            // Proceed with deletion
+
+            // First, delete it from Auth to ensure the user can't log in anymore
+            await DeleteUserByEmailAsync(employee.Email);
+
+            // Then delete it from the Employees table
             await _client
                 .From<EmployeesModel>()
                 .Where(e => e.Id == employeeId)
                 .Delete();
 
-            return true; // Assuming the deletion was successful if no exception was thrown
+            return true;
         }
         catch (Exception ex)
         {
             throw new Exception($"DeleteEmployee(int employeeId) raise Exception: {ex.Message}");
         }
     }
-    
-    
+
+    // Клас для десеріалізації користувача з API
+    private class SupabaseAdminUser
+    {
+        public string Id { get; set; }
+        public string Email { get; set; }
+    }
+
+    // Helper: Delete user by email using Supabase Auth Admin
+    private async Task DeleteUserByEmailAsync(string email)
+    {
+        try
+        {
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("apikey", ServiceRoleKey);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ServiceRoleKey}");
+            
+            // Get raw JSON response
+            var response = await client.GetAsync($"{SupabaseUrl}/auth/v1/admin/users");
+            response.EnsureSuccessStatusCode();
+            
+            var content = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Raw API Response: {content}"); // Для діагностики
+            
+            // Десеріалізуємо як масив SupabaseAdminUser
+            var users = JsonSerializer.Deserialize<SupabaseAdminUser[]>(content, new JsonSerializerOptions 
+            { 
+                PropertyNameCaseInsensitive = true 
+            });
+            
+            if (users != null)
+            {
+                var user = users.FirstOrDefault(u => u.Email == email);
+                if (user != null)
+                {
+                    var deleteResponse = await client.DeleteAsync($"{SupabaseUrl}/auth/v1/admin/users/{user.Id}");
+                    deleteResponse.EnsureSuccessStatusCode();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"DeleteUserByEmailAsync error details: {ex}");
+            throw new Exception($"DeleteUserByEmailAsync failed: {ex.Message}");
+        }
+    }
+
     // for Role: Manager - create a task
     
     public async Task<bool> CreateTaskAsync(int taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus)
@@ -296,7 +353,25 @@ public class SupabaseService
         }
     }
     
-    // for Role: Manager - get all tasks
+    // for Role: Manager - delete all Finished tasks
+        public async Task<bool> DeleteAllFinishedTasksAsync()
+        {
+            try
+            {
+                await _client
+                    .From<TasksModel>()
+                    .Where(task => task.Status == "Finished")
+                    .Delete();
+    
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"DeleteAllFinishedTasksAsync() raise Exception: {ex.Message}");
+            }
+        }
+    
+    // for Role: Worker - get all tasks
     
     public async Task<List<TasksModel>?> GetAllTasksByEmployeeId(int employeeId)
     {
@@ -311,25 +386,6 @@ public class SupabaseService
             throw new Exception($"GetAllTasksByEmployeeId(int employeeId) raise Exception: {ex.Message}");
         }
     }
-    
-    // for Role: Worker - delete all Finished tasks
-    public async Task<bool> DeleteAllFinishedTasksAsync()
-    {
-        try
-        {
-            await _client
-                .From<TasksModel>()
-                .Where(task => task.Status == "Finished")
-                .Delete();
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"DeleteAllFinishedTasksAsync() raise Exception: {ex.Message}");
-        }
-    }
-    
     
     // for Role: Worker- update task
     public async Task<bool> UpdateTaskWorker(int taskId, string taskStatus)
@@ -391,4 +447,12 @@ public class SupabaseService
         }
     }
     
+    public async Task<List<User>> ListUsers()
+    {
+        var response = await _httpClient.GetAsync($"{SupabaseUrl}/auth/v1/admin/users");
+        response.EnsureSuccessStatusCode();
+        
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<List<User>>(content);
+    }
 }

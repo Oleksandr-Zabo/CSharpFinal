@@ -1,0 +1,246 @@
+ @startuml
+class SupabaseService {
+    - SupabaseUrl : string
+    - SupabaseKey : string
+    - _client : Supabase.Client
+    - SupabaseUser : User
+    - IsLoggedIn : bool
+    - _instance : SupabaseService
+    + InitServiceAsync()
+    + LoginAsync(email, password)
+    + LogoutAsync()
+    + GetEmployeeByUserAsync(email, password)
+    + IsEmployeeByEmail(email)
+    + RegisterAsync(employee)
+    + GetAllRolesAsync()
+    + GetAllEmployeesAsync()
+    + DeleteEmployeeAsync(employeeId)
+    + CreateTaskAsync(taskEmployeeId, taskDescription, taskDeadLine, taskStatus)
+    + GetAllTasksAsync()
+    + GetAllTasksByEmployeeId(employeeId)
+    + DeleteAllFinishedTasksAsync()
+    + UpdateTaskWorker(taskId, taskStatus)
+    + GetEmployeeInfoById(employeeId)
+    + GetEmployeeInfoByEmail(email)
+}
+
+class Employees {
+    + Id : int
+    + Name : string
+    + Email : string
+    + RoleId : int
+    + Password : string
+}
+
+class Roles {
+    + Id : int
+    + RoleName : string
+}
+
+class Tasks {
+    + Id : int
+    + Description : string
+    + EmployeeId : int
+    + Deadline : DateTime
+    + Status : string
+}
+
+class EmployeesModel {
+    + Id : int
+    + Name : string
+    + Email : string
+    + RoleId : int
+    + Password : string
+}
+
+class RolesModel {
+    + Id : int
+    + RoleName : string
+}
+
+class TasksModel {
+    + Id : int
+    + EmployeeId : int
+    + Description : string
+    + Deadline : DateTime
+    + Status : string
+}
+
+class AdapterEmployeeFromModel {
+    + AdapterEmployeeFromModel(EmployeesModel model)
+}
+
+class AdapterEmployeeToModel {
+    + AdapterEmployeeToModel(Employees employee)
+}
+
+class AdapterTaskFromModel {
+    + AdapterTaskFromModel(TasksModel model)
+}
+
+class AdapterTaskToModel {
+    + AdapterTaskToModel(Tasks task)
+}
+
+class AdminRepository {
+    + GetAllRolesAsync()
+    + IsUserByEmailAsync(email)
+    + GetAllEmployeesAsync()
+    + DeleteEmployeeAsync(id)
+    + AddEmployeeAsync(employee)
+}
+
+class ManagerRepository {
+    + GetAllEmployeesAsync()
+    + CreateTaskAsync(taskEmployeeId, taskDescription, taskDeadLine, taskStatus)
+    + GetAllTasksAsync()
+    + DeleteAllFinishedTasksAsync()
+}
+
+class WorkerRepository {
+    + UpdateTaskWorker(taskId, taskStatus)
+    + GetAllTasksByEmployeeId(employeeId)
+    + GetEmployeeInfoById(employeeId)
+    + GetEmployeeInfoByEmail(email)
+}
+
+class LoginRepository {
+    + LoginAsync(email, password)
+    + GetEmployeeByUserAsync(email, password)
+}
+
+class AdminRepositoryImpl {
+    - _supabaseService : SupabaseService
+}
+
+class ManagerRepositoryImpl {
+    - _supabaseService : SupabaseService
+}
+
+class WorkerRepositoryImpl {
+    - _supabaseService : SupabaseService
+}
+
+class LoginRepositoryImpl {
+    - _supabaseService : SupabaseService
+}
+
+class MainWindow {
+    + MainWindow()
+    + MainWindowFrame : Frame
+    + Show()
+    + Close()
+    + Title : string
+    + DataContext : object
+    + InitializeComponent()
+}
+
+class LoginPage {
+    + LoginPage()
+    + EmailTextBox : TextBox
+    + PasswordBox : PasswordBox
+    + LoginButton : Button
+    + ErrorMessageTextBlock : TextBlock
+    + OnLoginButtonClick(sender, e)
+    + InitializeComponent()
+}
+
+class SplashWindow {
+    + SplashWindow()
+    + Timer : DispatcherTimer
+    + InitializeComponent()
+}
+
+class AdminWindow {
+    + AdminWindow()
+    + EmployeesListView : ListView
+    + AddEmployeeButton : Button
+    + DeleteEmployeeButton : Button
+    + LogoutButton : Button
+    + OnAddEmployeeClick(sender, e)
+    + OnDeleteEmployeeClick(sender, e)
+    + OnLogoutClick(sender, e)
+    + InitializeComponent()
+}
+
+class ManagerWindow {
+    + ManagerWindow()
+    + TasksListView : ListView
+    + CreateTaskButton : Button
+    + DeleteFinishedTasksButton : Button
+    + LogoutButton : Button
+    + OnCreateTaskClick(sender, e)
+    + OnDeleteFinishedTasksClick(sender, e)
+    + OnLogoutClick(sender, e)
+    + InitializeComponent()
+}
+
+class WorkerWindow {
+    + WorkerWindow()
+    + TasksListView : ListView
+    + UpdateTaskButton : Button
+    + LogoutButton : Button
+    + OnUpdateTaskClick(sender, e)
+    + OnLogoutClick(sender, e)
+    + InitializeComponent()
+}
+
+AdminWindow ..> AdminRepositoryImpl
+AdminWindow ..> Employees
+AdminWindow ..> Roles
+
+ManagerWindow ..> ManagerRepositoryImpl
+ManagerWindow ..> Employees
+ManagerWindow ..> Tasks
+
+WorkerWindow ..> WorkerRepositoryImpl
+WorkerWindow ..> Employees
+WorkerWindow ..> Tasks
+
+MainWindow ..> SupabaseService
+MainWindow ..> AdminRepositoryImpl
+MainWindow ..> ManagerRepositoryImpl
+MainWindow ..> WorkerRepositoryImpl
+MainWindow ..> LoginRepositoryImpl
+MainWindow ..> Employees
+MainWindow ..> Roles
+MainWindow ..> Tasks
+
+LoginPage ..> SupabaseService
+LoginPage ..> LoginRepositoryImpl
+LoginPage ..> Employees
+
+SplashWindow ..> SupabaseService
+
+AdminRepositoryImpl --|> AdminRepository
+ManagerRepositoryImpl --|> ManagerRepository
+WorkerRepositoryImpl --|> WorkerRepository
+LoginRepositoryImpl --|> LoginRepository
+
+AdminRepositoryImpl ..> SupabaseService
+ManagerRepositoryImpl ..> SupabaseService
+WorkerRepositoryImpl ..> SupabaseService
+LoginRepositoryImpl ..> SupabaseService
+
+SupabaseService ..> AdminRepository
+SupabaseService ..> ManagerRepository
+SupabaseService ..> WorkerRepository
+SupabaseService ..> LoginRepository
+
+AdminRepository ..> Employees : AddEmployeeAsync(employee)
+Employees "1" -- "1" Roles : RoleId
+Tasks "1" -- "1" Employees : EmployeeId
+
+AdapterEmployeeFromModel ..> EmployeesModel : uses
+AdapterEmployeeFromModel --|> Employees
+
+AdapterEmployeeToModel ..> Employees : uses
+AdapterEmployeeToModel --|> EmployeesModel
+
+AdapterTaskFromModel ..> TasksModel : uses
+AdapterTaskFromModel --|> Tasks
+
+AdapterTaskToModel ..> Tasks : uses
+AdapterTaskToModel --|> TasksModel
+
+@enduml

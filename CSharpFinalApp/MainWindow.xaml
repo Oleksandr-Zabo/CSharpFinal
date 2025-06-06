@@ -5,8 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSharpFinal"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Restaurant Management App" MinWidth="950" MinHeight="750"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized" Icon="pack://application:,,,/Assets/Icon/logo.ico" Background="Azure"
+        Loaded="MainWindow_OnLoaded">
     <Grid>
-
+        <Frame x:Name="MainWindowFrame" NavigationUIVisibility="Hidden"></Frame>
     </Grid>
 </Window>

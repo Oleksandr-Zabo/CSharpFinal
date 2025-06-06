@@ -1,0 +1,27 @@
+@startuml
+' Restaurant Management System Deployment Diagram (with Supabase)
+
+actor User
+
+node "Client PC" {
+  [WPF App]
+}
+
+node "Application Server" {
+  [CSharpFinalCore]
+  [CSharpFinalApp]
+}
+
+cloud "Supabase Cloud" {
+  database "Supabase PostgreSQL" as db
+  [Supabase API]
+}
+
+User --> [WPF App] : interacts
+[WPF App] --> [CSharpFinalApp] : UI calls
+[CSharpFinalApp] --> [CSharpFinalCore] : business logic
+[CSharpFinalCore] --> [Supabase API] : REST/gRPC calls
+[Supabase API] --> db : SQL queries
+
+@enduml
+

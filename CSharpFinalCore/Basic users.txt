@@ -1,0 +1,29 @@
+Admin{
+Name:     Admin
+email:    zoleksandr06@gmail.com
+password: admin_pass
+}
+
+Manager{
+Name:     Manager
+email:    neyaso2429@ofular.com
+password: manager_pass
+}
+
+Waiter{
+Name:     Joey Moody
+email:    rzrmwth@tmpmailtor.com
+password: waiter_pass
+}
+
+Chef 1{
+Name:     Oscar Fox
+email:    jifetor242@endelite.com
+password: chef1_pass
+}
+
+Chef 2{
+Name:     Cade Mann
+email:    Takeysha.Perrett@AllFreeMail.net
+password: chef_pass
+}

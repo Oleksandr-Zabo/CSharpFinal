@@ -28,33 +28,33 @@ public class WorkerRepositoryImpl: WorkerRepository
         }
     }
 
-    public override async Task<List<Tasks>?> GetAllTasksByEmployeeId(int employeeId) 
+    public override async Task<List<Tasks>?> GetAllTasksByEmployeeId(string employeeId) 
     {
         try
         {
             await _supabaseService.InitServiceAsync();
-            var tasks = await _supabaseService.GetAllTasksByEmployeeId(employeeId.ToString()); 
+            var tasks = await _supabaseService.GetAllTasksByEmployeeId(employeeId);
             return tasks?.Select(t => new AdapterTaskFromModel(t)).Cast<Tasks>().ToList();
         }
         catch (Exception ex)
         {
-            throw new Exception($"GetAllTasksByEmployeeId(int employeeId) failed: {ex.Message}");
+            throw new Exception($"GetAllTasksByEmployeeId(string employeeId) failed: {ex.Message}");
         }
     }
 
-    public override async Task<Employees?> GetEmployeeInfoById(int employeeId)
+    public override async Task<Employees?> GetEmployeeInfoById(string employeeId)
     {
         try
         {
             await _supabaseService.InitServiceAsync();
-            var employeeModel = await _supabaseService.GetEmployeeInfoById(employeeId.ToString());
+            var employeeModel = await _supabaseService.GetEmployeeInfoById(employeeId);
             if (employeeModel == null) return null;
 
             return new AdapterEmployeeFromModel(employeeModel);
         }
         catch (Exception ex)
         {
-            throw new Exception($"GetEmployeeInfoById(int employeeId) failed: {ex.Message}");
+            throw new Exception($"GetEmployeeInfoById(string employeeId) failed: {ex.Message}");
         }
     }
 

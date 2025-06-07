@@ -62,7 +62,7 @@ public partial class WorkerPage : UserControl
     {
         try
         {
-            var allTasks = await _workerRepository.GetAllTasksByEmployeeId(int.Parse(_employee.Id));
+            var allTasks = await _workerRepository.GetAllTasksByEmployeeId(_employee.Id);
             _tasks = allTasks?.Select(t => new TaskViewModel
             {
                 Id = t.Id,

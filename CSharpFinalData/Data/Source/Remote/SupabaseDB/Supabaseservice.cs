@@ -168,29 +168,32 @@ public class SupabaseService
         {
             // Register the user- register+ add data to tables
             var session = await _client.Auth.SignUp(employee.Email, employee.Password);
-            if (session != null)
+            string userId = session?.User?.Id;
+            if (string.IsNullOrEmpty(userId))
             {
-                // Add the employee to the Employees table
-                var result = await _client.From<EmployeesModel>().Insert(new EmployeesModel
+                userId = await GetUserIdByEmailAsync(employee.Email);
+                if (string.IsNullOrEmpty(userId))
                 {
-                    Name = employee.Name,
-                    Email = employee.Email,
-                    RoleId = employee.RoleId,
-                    Password = employee.Password
-                });
-    
-                if (result.Models.Count > 0)
-                {
-                    return session;
+                    throw new Exception("Failed to retrieve user id after registration.");
                 }
-                else
-                {
-                    throw new Exception("Failed to add employee to the database.");
-                }
+            }
+            // Add the employee to the Employees table using the Supabase Auth user id
+            var result = await _client.From<EmployeesModel>().Insert(new EmployeesModel
+            {
+                Id = userId, // Use the id from Supabase Auth
+                Name = employee.Name,
+                Email = employee.Email,
+                RoleId = employee.RoleId,
+                Password = employee.Password
+            });
+
+            if (result.Models.Count > 0)
+            {
+                return session;
             }
             else
             {
-                throw new Exception("Registration failed.");
+                throw new Exception("Failed to add employee to the database.");
             }
         }
         catch (Exception ex)
@@ -228,14 +231,14 @@ public class SupabaseService
     }
     
     // for Role: Admin - delete employee and check if no admin
-    public async Task<bool>? DeleteEmployeeAsync(int employeeId)
+    public async Task<bool>? DeleteEmployeeAsync(string employeeId) // Changed parameter type to string
     {
         try
         {
             // Fetch the employee to check their role
             var employee = await _client
                 .From<EmployeesModel>()
-                .Where(e => e.Id == employeeId)
+                .Where(e => e.Id == employeeId) // Updated to match string Id
                 .Single();
 
             if (employee == null)
@@ -260,18 +263,17 @@ public class SupabaseService
             // Then delete it from the Employees table
             await _client
                 .From<EmployeesModel>()
-                .Where(e => e.Id == employeeId)
+                .Where(e => e.Id == employeeId) // Updated to match string Id
                 .Delete();
 
             return true;
         }
         catch (Exception ex)
         {
-            throw new Exception($"DeleteEmployee(int employeeId) raise Exception: {ex.Message}");
+            throw new Exception($"DeleteEmployee(string employeeId) raise Exception: {ex.Message}");
         }
     }
-
-    // Клас для десеріалізації користувача з API
+    
     private class SupabaseAdminUser
     {
         public string Id { get; set; }
@@ -292,9 +294,8 @@ public class SupabaseService
             response.EnsureSuccessStatusCode();
             
             var content = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Raw API Response: {content}"); // Для діагностики
+            Console.WriteLine($"Raw API Response: {content}"); 
             
-            // Десеріалізуємо як масив SupabaseAdminUser
             var users = JsonSerializer.Deserialize<SupabaseAdminUser[]>(content, new JsonSerializerOptions 
             { 
                 PropertyNameCaseInsensitive = true 
@@ -317,15 +318,40 @@ public class SupabaseService
         }
     }
 
+    // Updated user deletion logic
+    private async Task DeleteUserByIdAsync(string userId)
+    {
+        try
+        {
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("apikey", ServiceRoleKey);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ServiceRoleKey}");
+
+            // Delete the user from Supabase Auth
+            var deleteResponse = await client.DeleteAsync($"{SupabaseUrl}/auth/v1/admin/users/{userId}");
+            deleteResponse.EnsureSuccessStatusCode();
+
+            // Delete the user from the Employees table
+            await _client.From<EmployeesModel>()
+                .Where(e => e.Id == userId)
+                .Delete();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"DeleteUserByIdAsync error details: {ex}");
+            throw new Exception($"DeleteUserByIdAsync failed: {ex.Message}");
+        }
+    }
+
     // for Role: Manager - create a task
     
-    public async Task<bool> CreateTaskAsync(int taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus)
+    public async Task<bool> CreateTaskAsync(string taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus)
     {
         try
         {
             var result = await _client.From<TasksModel>().Insert(new TasksModel
             {
-                EmployeeId = taskEmployeeId,
+                EmployeeId = taskEmployeeId, 
                 Description = taskDescription,
                 Deadline = taskDeadLine,
                 Status = taskStatus
@@ -335,7 +361,7 @@ public class SupabaseService
         }
         catch (Exception ex)
         {
-            throw new Exception($"CreateTask(int taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus) raise Exception: {ex.Message}");
+            throw new Exception($"CreateTask(string taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus) raise Exception: {ex.Message}");
         }
     }
     
@@ -373,7 +399,7 @@ public class SupabaseService
     
     // for Role: Worker - get all tasks
     
-    public async Task<List<TasksModel>?> GetAllTasksByEmployeeId(int employeeId)
+    public async Task<List<TasksModel>?> GetAllTasksByEmployeeId(string employeeId)
     {
         try
         {
@@ -383,7 +409,7 @@ public class SupabaseService
         }
         catch (Exception ex)
         {
-            throw new Exception($"GetAllTasksByEmployeeId(int employeeId) raise Exception: {ex.Message}");
+            throw new Exception($"GetAllTasksByEmployeeId(string employeeId) raise Exception: {ex.Message}");
         }
     }
     
@@ -418,7 +444,7 @@ public class SupabaseService
     }
     
     // for Role: Worker - get info about worker by id
-    public async Task<EmployeesModel?> GetEmployeeInfoById(int employeeId)
+    public async Task<EmployeesModel?> GetEmployeeInfoById(string employeeId)
     {
         try
         {
@@ -428,7 +454,7 @@ public class SupabaseService
         }
         catch (Exception ex)
         {
-            throw new Exception($"GetEmployeeInfo(int employeeId) raise Exception: {ex.Message}");
+            throw new Exception($"GetEmployeeInfo(string employeeId) raise Exception: {ex.Message}");
         }
     }
     
@@ -454,5 +480,41 @@ public class SupabaseService
         
         var content = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<List<User>>(content);
+    }
+    
+    // Get user id from Supabase Auth Admin API by email (fix: handle object/array response)
+    private async Task<string?> GetUserIdByEmailAsync(string email)
+    {
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("apikey", ServiceRoleKey);
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ServiceRoleKey}");
+        var response = await client.GetAsync($"{SupabaseUrl}/auth/v1/admin/users?email={Uri.EscapeDataString(email)}");
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+        // Try to parse as object with 'users' array
+        try
+        {
+            using var doc = JsonDocument.Parse(content);
+            if (doc.RootElement.TryGetProperty("users", out var usersElem) && usersElem.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var userElem in usersElem.EnumerateArray())
+                {
+                    if (userElem.TryGetProperty("email", out var emailElem) && emailElem.GetString() == email)
+                    {
+                        if (userElem.TryGetProperty("id", out var idElem))
+                            return idElem.GetString();
+                    }
+                }
+            }
+            // Try as single user object
+            if (doc.RootElement.TryGetProperty("id", out var idElem2) &&
+                doc.RootElement.TryGetProperty("email", out var emailElem2) &&
+                emailElem2.GetString() == email)
+            {
+                return idElem2.GetString();
+            }
+        }
+        catch { /* ignore parse errors */ }
+        return null;
     }
 }

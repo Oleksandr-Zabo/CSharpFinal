@@ -5,9 +5,15 @@ using CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
 namespace CSharpFinalData.Data.RepositoryImpl.AdminRepositoryImpl;
 
-public class AdminRepositoryImpl(SupabaseService supabaseService) : AdminRepository
+public class AdminRepositoryImpl : AdminRepository
 {
-    private readonly SupabaseService? _supabaseService = supabaseService;
+    private readonly SupabaseService _supabaseService;
+
+    public AdminRepositoryImpl(SupabaseService supabaseService)
+    {
+        _supabaseService = supabaseService ?? throw new ArgumentNullException(nameof(supabaseService));
+    }
+    
 
     public override async Task<List<Roles>> GetAllRolesAsync()
     {
@@ -31,14 +37,14 @@ public class AdminRepositoryImpl(SupabaseService supabaseService) : AdminReposit
         return employeesModels.Select(em => new Employees(em.Id, em.Name, em.Email, em.RoleId, em.Password)).ToList();
     }
 
-    public override async Task<bool> DeleteEmployeeAsync(int id)
+    public override async Task<bool> DeleteEmployeeAsync(int id) 
     {
         if (_supabaseService == null)
         {
             return false;
         }
-    
-        return await _supabaseService.DeleteEmployeeAsync(id)!;
+
+        return await _supabaseService.DeleteEmployeeAsync(id.ToString())!; 
     }
 
     public override async Task<bool> AddEmployeeAsync(Employees employee)

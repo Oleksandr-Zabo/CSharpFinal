@@ -28,12 +28,12 @@ public class WorkerRepositoryImpl: WorkerRepository
         }
     }
 
-    public override async Task<List<Tasks>?> GetAllTasksByEmployeeId(int employeeId)
+    public override async Task<List<Tasks>?> GetAllTasksByEmployeeId(int employeeId) 
     {
         try
         {
             await _supabaseService.InitServiceAsync();
-            var tasks = await _supabaseService.GetAllTasksByEmployeeId(employeeId);
+            var tasks = await _supabaseService.GetAllTasksByEmployeeId(employeeId.ToString()); 
             return tasks?.Select(t => new AdapterTaskFromModel(t)).Cast<Tasks>().ToList();
         }
         catch (Exception ex)
@@ -47,7 +47,7 @@ public class WorkerRepositoryImpl: WorkerRepository
         try
         {
             await _supabaseService.InitServiceAsync();
-            var employeeModel = await _supabaseService.GetEmployeeInfoById(employeeId);
+            var employeeModel = await _supabaseService.GetEmployeeInfoById(employeeId.ToString());
             if (employeeModel == null) return null;
 
             return new AdapterEmployeeFromModel(employeeModel);

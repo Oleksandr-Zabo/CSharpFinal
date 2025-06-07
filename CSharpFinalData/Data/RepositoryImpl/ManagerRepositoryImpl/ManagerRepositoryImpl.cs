@@ -20,7 +20,7 @@ public class ManagerRepositoryImpl(SupabaseService supabaseService) : ManagerRep
         return employeesModels.Select(em => new Employees(em.Id, em.Name, em.Email, em.RoleId, em.Password)).ToList();
     }
 
-    public override async Task<bool> CreateTaskAsync(int taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus)
+    public override async Task<bool> CreateTaskAsync(string taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus)
     {
         if (_supabaseService == null)
         {
@@ -33,7 +33,7 @@ public class ManagerRepositoryImpl(SupabaseService supabaseService) : ManagerRep
         }
         catch (Exception ex)
         {
-            throw new Exception($"CreateTaskAsync(int taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus) raised an exception: {ex.Message}");
+            throw new Exception($"CreateTaskAsync(string taskEmployeeId, string taskDescription, DateTime taskDeadLine, string taskStatus) raised an exception: {ex.Message}");
         }
     }
 

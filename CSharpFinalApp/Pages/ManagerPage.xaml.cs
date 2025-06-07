@@ -14,7 +14,7 @@ namespace CSharpFinal.Pages;
 public partial class ManagerPage : UserControl
 {
     private readonly ManagerRepositoryImpl _managerRepository;
-    private readonly Employees _employee;
+    private readonly Employees? _employee;
     private List<Employees> _workers = new();
     private List<TaskViewModel> _tasks = new();
 
@@ -57,7 +57,7 @@ public partial class ManagerPage : UserControl
             {
                 Id = t.Id,
                 Description = t.Description,
-                WorkerId = t.EmployeeId,
+                WorkerId = t.EmployeeId, // Updated to string
                 WorkerName = _workers.FirstOrDefault(w => w.Id == t.EmployeeId)?.Name ?? "—",
                 Deadline = t.Deadline,
                 Status = t.Status
@@ -96,7 +96,7 @@ public partial class ManagerPage : UserControl
 
         try
         {
-            await _managerRepository.CreateTaskAsync(selectedWorker.Id, description, deadline, "New");
+            await _managerRepository.CreateTaskAsync(int.Parse(selectedWorker.Id), description, deadline, "New");
             MessageBox.Show("Завдання додано!");
             TaskDescriptionTextBox.Text = "";
             DeadlineDatePicker.SelectedDate = null;
@@ -127,7 +127,7 @@ public partial class ManagerPage : UserControl
             MessageBox.Show("Помилка при виході: " + ex.Message);
             return;
         }
-        var mainWindow = (MainWindow)Application.Current.MainWindow;
+        var mainWindow = Application.Current?.MainWindow as MainWindow;
         mainWindow?.MainWindowFrame.Navigate(new LoginPage());
     }
     
@@ -162,7 +162,7 @@ public partial class ManagerPage : UserControl
     
             await File.AppendAllLinesAsync(filePath, reportLines);
     
-            MessageBox.Show($"Звіт додано до файлу:\n{filePath}");
+            MessageBox.Show($"Звіт д��дано до файлу:\n{filePath}");
         }
         catch (Exception ex)
         {
@@ -197,10 +197,10 @@ public partial class ManagerPage : UserControl
     private class TaskViewModel
     {
         public int Id { get; set; }
-        public string Description { get; set; }
-        public int WorkerId { get; set; }
-        public string WorkerName { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public string WorkerId { get; set; } = string.Empty;
+        public string WorkerName { get; set; } = string.Empty;
         public DateTime Deadline { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
     }
 }

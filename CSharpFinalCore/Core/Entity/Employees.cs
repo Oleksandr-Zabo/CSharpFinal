@@ -2,7 +2,7 @@ namespace CSharpFinalCore.Core.Entity;
 
 public class Employees
 {
-    public int Id { get; set; }
+    public string Id { get; set; } 
     public string Name { get; set; }
     public string Email { get; set; }
     public int RoleId { get; set; }
@@ -10,15 +10,14 @@ public class Employees
 
     public Employees()
     {
-        Id = 0;
+        Id = string.Empty; 
         Name = string.Empty;
         Email = string.Empty;
         RoleId = 0;
         Password = string.Empty;
     }
-    
 
-    public Employees(int id, string name, string email, int roleId, string password)
+    public Employees(string id, string name, string email, int roleId, string password) // Updated constructor
     {
         Id = id;
         Name = name;
@@ -31,5 +30,4 @@ public class Employees
     {
         return $"Id: {Id}, Name: {Name}, Email: {Email}, RoleId: {RoleId}, Password: {Password}";
     }
-    
 }

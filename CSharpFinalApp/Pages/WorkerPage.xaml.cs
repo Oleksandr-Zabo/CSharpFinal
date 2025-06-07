@@ -62,7 +62,7 @@ public partial class WorkerPage : UserControl
     {
         try
         {
-            var allTasks = await _workerRepository.GetAllTasksByEmployeeId(_employee.Id);
+            var allTasks = await _workerRepository.GetAllTasksByEmployeeId(int.Parse(_employee.Id));
             _tasks = allTasks?.Select(t => new TaskViewModel
             {
                 Id = t.Id,
@@ -147,8 +147,8 @@ public partial class WorkerPage : UserControl
     private class TaskViewModel
     {
         public int Id { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public DateTime Deadline { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
     }
 }

@@ -10,7 +10,7 @@ public class TasksModel: BaseModel
     public int Id { get; set; }
     
     [Column ("EmployeeId")]
-    public int EmployeeId { get; set; }
+    public string EmployeeId { get; set; }
     
     [Column("Description")]
     public string Description { get; set; }
@@ -24,13 +24,13 @@ public class TasksModel: BaseModel
     public TasksModel()
     {
         Id = 0;
-        EmployeeId = 0;
+        EmployeeId = string.Empty;
         Description = string.Empty;
         Deadline = DateTime.Now;
         Status = string.Empty;
     }
     
-    public TasksModel(int id, int employeeId, string description, DateTime deadline, string status): this()
+    public TasksModel(int id, string employeeId, string description, DateTime deadline, string status): this()
     {
         Id = id;
         EmployeeId = employeeId;

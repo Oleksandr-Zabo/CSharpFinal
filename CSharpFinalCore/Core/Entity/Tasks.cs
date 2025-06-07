@@ -4,7 +4,7 @@ public class Tasks
 {
     public int Id { get; set; }
     public string Description { get; set; }
-    public int EmployeeId { get; set; }
+    public string EmployeeId { get; set; } 
     public DateTime Deadline { get; set; }
     public string Status { get; set; }
 
@@ -12,12 +12,12 @@ public class Tasks
     {
         Id = 0;
         Description = string.Empty;
-        EmployeeId = 0;
+        EmployeeId = string.Empty; 
         Deadline = DateTime.Now;
         Status = string.Empty;
     }
 
-    public Tasks(int id, string description, int employeeId, DateTime deadline, string status)
+    public Tasks(int id, string description, string employeeId, DateTime deadline, string status)
     {
         Id = id;
         Description = description;

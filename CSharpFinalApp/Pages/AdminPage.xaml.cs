@@ -115,7 +115,7 @@ public partial class AdminPage : UserControl
 
         try
         {
-            await _adminRepository.DeleteEmployeeAsync(int.Parse(selectedEmployee.Id));
+            await _adminRepository.DeleteEmployeeAsync(selectedEmployee.Id);
             MessageBox.Show("Працівника видалено.");
             await LoadEmployeesAsync();
         }

@@ -16,7 +16,7 @@ public class SupabaseService
 {
     private const string SupabaseUrl = "https://blsbwhilzmlhlhxywfpl.supabase.co";
     private const string SupabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsc2J3aGlsem1saGxoeHl3ZnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU5NDg0MTYsImV4cCI6MjA2MTUyNDQxNn0.QN24DqtBr6wFqHNyAYw-XOoHGxbxx0fneOoDJxFsDHo";
-    private const string ServiceRoleKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsc2J3aGlsem1saGxoeHl3ZnBsIiwicm9zZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTk0ODQxNiwiZXhwIjoyMDYxNTI0NDE2fQ.dH5PW2YV4vJ7JarMGwWDUlk-NT-5dNc5VxMpRUEmWqQ";
+    private const string ServiceRoleKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsc2J3aGlsem1saGxoeHl3ZnBsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTk0ODQxNiwiZXhwIjoyMDYxNTI0NDE2fQ.dH5PW2YV4vJ7JarMGwWDUlk-NT-5dNc5VxMpRUEmWqQ";
     
     private readonly Supabase.Client _client;
     private readonly HttpClient _httpClient;
@@ -230,15 +230,31 @@ public class SupabaseService
         }
     }
     
+    // Checks if the employee is an admin by employeeId
+    public async Task<bool> IsEmployeeAdminAsync(string employeeId)
+    {
+        var employee = await _client
+            .From<EmployeesModel>()
+            .Where(e => e.Id == employeeId)
+            .Single();
+        if (employee == null)
+            throw new Exception("Employee not found.");
+        var role = await _client
+            .From<RolesModel>()
+            .Where(r => r.Id == employee.RoleId)
+            .Single();
+        return role != null && role.RoleName.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+    }
+
     // for Role: Admin - delete employee and check if no admin
-    public async Task<bool>? DeleteEmployeeAsync(string employeeId) // Changed parameter type to string
+    public async Task<bool>? DeleteEmployeeAsync(string employeeId)
     {
         try
         {
             // Fetch the employee to check their role
             var employee = await _client
                 .From<EmployeesModel>()
-                .Where(e => e.Id == employeeId) // Updated to match string Id
+                .Where(e => e.Id == employeeId)
                 .Single();
 
             if (employee == null)
@@ -247,74 +263,26 @@ public class SupabaseService
             }
 
             // Check if the employee is an admin
-            var role = await _client
-                .From<RolesModel>()
-                .Where(r => r.Id == employee.RoleId)
-                .Single();
-
-            if (role != null && role.RoleName.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+            var isAdmin = await IsEmployeeAdminAsync(employeeId);
+            if (isAdmin)
             {
                 throw new Exception("Cannot delete an admin employee.");
             }
 
-            // First, delete it from Auth to ensure the user can't log in anymore
-            await DeleteUserByEmailAsync(employee.Email);
-
-            // Then delete it from the Employees table
+            // 1. Delete it from the Employees table first
             await _client
                 .From<EmployeesModel>()
-                .Where(e => e.Id == employeeId) // Updated to match string Id
+                .Where(e => e.Id == employeeId)
                 .Delete();
+
+            // 2. Then delete it from Auth
+            await DeleteUserByIdAsync(employee.Id);
 
             return true;
         }
         catch (Exception ex)
         {
             throw new Exception($"DeleteEmployee(string employeeId) raise Exception: {ex.Message}");
-        }
-    }
-    
-    private class SupabaseAdminUser
-    {
-        public string Id { get; set; }
-        public string Email { get; set; }
-    }
-
-    // Helper: Delete user by email using Supabase Auth Admin
-    private async Task DeleteUserByEmailAsync(string email)
-    {
-        try
-        {
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("apikey", ServiceRoleKey);
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ServiceRoleKey}");
-            
-            // Get raw JSON response
-            var response = await client.GetAsync($"{SupabaseUrl}/auth/v1/admin/users");
-            response.EnsureSuccessStatusCode();
-            
-            var content = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Raw API Response: {content}"); 
-            
-            var users = JsonSerializer.Deserialize<SupabaseAdminUser[]>(content, new JsonSerializerOptions 
-            { 
-                PropertyNameCaseInsensitive = true 
-            });
-            
-            if (users != null)
-            {
-                var user = users.FirstOrDefault(u => u.Email == email);
-                if (user != null)
-                {
-                    var deleteResponse = await client.DeleteAsync($"{SupabaseUrl}/auth/v1/admin/users/{user.Id}");
-                    deleteResponse.EnsureSuccessStatusCode();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"DeleteUserByEmailAsync error details: {ex}");
-            throw new Exception($"DeleteUserByEmailAsync failed: {ex.Message}");
         }
     }
 
@@ -324,17 +292,18 @@ public class SupabaseService
         try
         {
             using var client = new HttpClient();
+            // Ensure both headers are set and log the key length for debug
+            client.DefaultRequestHeaders.Remove("apikey");
+            client.DefaultRequestHeaders.Remove("Authorization");
             client.DefaultRequestHeaders.Add("apikey", ServiceRoleKey);
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ServiceRoleKey}");
 
-            // Delete the user from Supabase Auth
             var deleteResponse = await client.DeleteAsync($"{SupabaseUrl}/auth/v1/admin/users/{userId}");
-            deleteResponse.EnsureSuccessStatusCode();
-
-            // Delete the user from the Employees table
-            await _client.From<EmployeesModel>()
-                .Where(e => e.Id == userId)
-                .Delete();
+            if (!deleteResponse.IsSuccessStatusCode)
+            {
+                var errorContent = await deleteResponse.Content.ReadAsStringAsync();
+                throw new Exception($"Supabase Auth API error: {deleteResponse.StatusCode} - {errorContent}. Check that ServiceRoleKey is correct and has admin privileges.");
+            }
         }
         catch (Exception ex)
         {
@@ -491,7 +460,7 @@ public class SupabaseService
         var response = await client.GetAsync($"{SupabaseUrl}/auth/v1/admin/users?email={Uri.EscapeDataString(email)}");
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
-        // Try to parse as object with 'users' array
+        // Try to parse as an object with 'users' array
         try
         {
             using var doc = JsonDocument.Parse(content);
@@ -506,7 +475,7 @@ public class SupabaseService
                     }
                 }
             }
-            // Try as single user object
+            // Try as a single user object
             if (doc.RootElement.TryGetProperty("id", out var idElem2) &&
                 doc.RootElement.TryGetProperty("email", out var emailElem2) &&
                 emailElem2.GetString() == email)

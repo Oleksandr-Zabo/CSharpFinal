@@ -162,7 +162,7 @@ public partial class ManagerPage : UserControl
     
             await File.AppendAllLinesAsync(filePath, reportLines);
     
-            MessageBox.Show($"Звіт д��дано до файлу:\n{filePath}");
+            MessageBox.Show($"Звіт додано до файлу:\n{filePath}");
         }
         catch (Exception ex)
         {

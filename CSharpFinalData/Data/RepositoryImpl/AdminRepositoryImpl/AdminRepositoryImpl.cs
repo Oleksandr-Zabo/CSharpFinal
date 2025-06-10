@@ -37,14 +37,13 @@ public class AdminRepositoryImpl : AdminRepository
         return employeesModels.Select(em => new Employees(em.Id, em.Name, em.Email, em.RoleId, em.Password)).ToList();
     }
 
-    public override async Task<bool> DeleteEmployeeAsync(int id) 
+    public override async Task<bool> DeleteEmployeeAsync(string id)
     {
         if (_supabaseService == null)
         {
             return false;
         }
-
-        return await _supabaseService.DeleteEmployeeAsync(id.ToString())!; 
+        return await _supabaseService.DeleteEmployeeAsync(id)!;
     }
 
     public override async Task<bool> AddEmployeeAsync(Employees employee)

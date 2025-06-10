@@ -16,6 +16,7 @@ public partial class WorkerPage : UserControl
     private readonly Employees _employee;
     private List<TaskViewModel> _tasks = new();
     private string _roleName = "";
+    private System.Timers.Timer? _taskMonitorTimer;
 
     public WorkerPage(Employees employee, WorkerRepositoryImpl? repository)
     {
@@ -23,12 +24,19 @@ public partial class WorkerPage : UserControl
         _employee = employee ?? throw new ArgumentNullException(nameof(employee));
         _workerRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         Loaded += WorkerPage_Loaded;
+        Unloaded += WorkerPage_Unloaded;
+        // Set up a timer to monitor for new tasks every 5 seconds
+        _taskMonitorTimer = new System.Timers.Timer(5000); // 5 seconds
+        _taskMonitorTimer.Elapsed += async (s, e) => await Dispatcher.InvokeAsync(LoadTasksAsync);
+        _taskMonitorTimer.AutoReset = true;
+        _taskMonitorTimer.Enabled = true;
     }
 
     private async void WorkerPage_Loaded(object sender, RoutedEventArgs e)
     {
         await LoadWorkerInfoAsync();
         await LoadTasksAsync();
+        _taskMonitorTimer?.Start();
     }
 
     private async Task LoadWorkerInfoAsync()
@@ -141,6 +149,16 @@ public partial class WorkerPage : UserControl
         catch (Exception ex)
         {
             MessageBox.Show("Помилка при виході: " + ex.Message);
+        }
+    }
+
+    private void WorkerPage_Unloaded(object sender, RoutedEventArgs e)
+    {
+        if (_taskMonitorTimer != null)
+        {
+            _taskMonitorTimer.Stop();
+            _taskMonitorTimer.Dispose();
+            _taskMonitorTimer = null;
         }
     }
 

@@ -4,15 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using CSharpFinalCore.Core.Entity;
-using CSharpFinalData.Data.Models;
 using CSharpFinalData.Data.RepositoryImpl.WorkerRepositoryImpl;
 using CSharpFinalData.Data.Source.Remote.SupabaseDB;
+using CSharpFinalData.Data.Models;
 
 namespace UnitTests
 {
     public class FakeSupabaseService : SupabaseService
     {
-        // Optionally override methods if needed for more isolation
     }
 
     public class TestWorkerRepositoryImpl : WorkerRepositoryImpl
@@ -27,7 +26,10 @@ namespace UnitTests
         }
         
         public Task<List<RolesModel>> GetAllRolesAsync() => Task.FromResult(_roles);
-        public override Task<List<Tasks>?> GetAllTasksByEmployeeId(int employeeId) => Task.FromResult(_tasks);
+        public Task<List<Tasks>> GetAllTasksByEmployeeId(string employeeId) 
+        {
+            return Task.FromResult(_tasks.Where(t => t.EmployeeId == employeeId).ToList()); 
+        }
     }
 
     [TestFixture]
@@ -37,7 +39,7 @@ namespace UnitTests
         public async Task LoadWorkerInfoAsync_SetsWorkerInfoAndRoleName()
         {
             // Arrange
-            var employee = new Employees(1, "TestName", "test@mail.com", 2, "pass");
+            var employee = new Employees("1", "TestName", "test@mail.com", 2, "pass"); 
             var roles = new List<RolesModel>
             {
                 new RolesModel { Id = 2, RoleName = "Менеджер" }
@@ -58,11 +60,11 @@ namespace UnitTests
         public async Task LoadTasksAsync_MapsTasksAndNormalizesStatus()
         {
             // Arrange
-            var employee = new Employees(1, "TestName", "test@mail.com", 2, "pass");
+            var employee = new Employees("1", "TestName", "test@mail.com", 2, "pass"); 
             var tasks = new List<Tasks>
             {
-                new Tasks { Id = 1, Description = "Task1", Deadline = DateTime.Today, Status = "New" },
-                new Tasks { Id = 2, Description = "Task2", Deadline = DateTime.Today, Status = "Other" }
+                new Tasks { Id = 1, Description = "Task1", EmployeeId = "1", Deadline = DateTime.Today, Status = "New" },
+                new Tasks { Id = 2, Description = "Task2", EmployeeId = "1", Deadline = DateTime.Today, Status = "Other" }
             };
             var repo = new TestWorkerRepositoryImpl(new FakeSupabaseService(), new List<RolesModel>(), tasks);
 
@@ -98,4 +100,3 @@ namespace UnitTests
         }
     }
 }
-

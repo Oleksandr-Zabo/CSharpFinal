@@ -28,7 +28,7 @@ public class WorkerRepositoryImpl: WorkerRepository
         }
     }
 
-    public override async Task<List<Tasks>?> GetAllTasksByEmployeeId(int employeeId)
+    public override async Task<List<Tasks>?> GetAllTasksByEmployeeId(string employeeId) 
     {
         try
         {
@@ -38,11 +38,11 @@ public class WorkerRepositoryImpl: WorkerRepository
         }
         catch (Exception ex)
         {
-            throw new Exception($"GetAllTasksByEmployeeId(int employeeId) failed: {ex.Message}");
+            throw new Exception($"GetAllTasksByEmployeeId(string employeeId) failed: {ex.Message}");
         }
     }
 
-    public override async Task<Employees?> GetEmployeeInfoById(int employeeId)
+    public override async Task<Employees?> GetEmployeeInfoById(string employeeId)
     {
         try
         {
@@ -54,7 +54,7 @@ public class WorkerRepositoryImpl: WorkerRepository
         }
         catch (Exception ex)
         {
-            throw new Exception($"GetEmployeeInfoById(int employeeId) failed: {ex.Message}");
+            throw new Exception($"GetEmployeeInfoById(string employeeId) failed: {ex.Message}");
         }
     }
 

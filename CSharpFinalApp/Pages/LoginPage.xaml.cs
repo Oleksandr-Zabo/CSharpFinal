@@ -17,7 +17,7 @@ public partial class LoginPage : UserControl
     public LoginPage()
     {
         InitializeComponent();
-        _supabaseService = new SupabaseService();
+        _supabaseService = new SupabaseService();// Initialize SupabaseService
     }
 
     private async void OnLoginButtonClick(object sender, RoutedEventArgs e)

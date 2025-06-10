@@ -1,4 +1,4 @@
- @startuml
+@startuml
 class SupabaseService {
     - SupabaseUrl : string
     - SupabaseKey : string
@@ -14,8 +14,8 @@ class SupabaseService {
     + RegisterAsync(employee)
     + GetAllRolesAsync()
     + GetAllEmployeesAsync()
-    + DeleteEmployeeAsync(employeeId)
-    + CreateTaskAsync(taskEmployeeId, taskDescription, taskDeadLine, taskStatus)
+    + DeleteEmployeeAsync(employeeId : string)
+    + CreateTaskAsync(taskEmployeeId : string, taskDescription, taskDeadLine, taskStatus)
     + GetAllTasksAsync()
     + GetAllTasksByEmployeeId(employeeId)
     + DeleteAllFinishedTasksAsync()

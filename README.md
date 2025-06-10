@@ -129,25 +129,31 @@ The system comes with pre-configured users for testing and initial setup:
    - Email: rzrmwth@tmpmailtor.com
    - Password: waiter_pass
 
-2. Chef
+2. Chef 1
    - Name: Oscar Fox
    - Email: jifetor242@endelite.com
+   - Password: chef1_pass
+
+3. Chef 2
+   - Name: Cade Mann
+   - Email: Takeysha.Perrett@AllFreeMail.net
+   - Password: chef_pass
 
 > Note: These are default testing accounts. It's recommended to change passwords in production environment.
 
 ## Screenshots
 
 ### Login Page
-![Login Page](CSharpFinalCore/AppImages/log-in.PNG)
+![Login Page](CSharpFinalApp/AppExampleImages/log-in.PNG)
 
 ### Admin Dashboard
-![Admin Dashboard](CSharpFinalCore/AppImages/admin.PNG)
+![Admin Dashboard](CSharpFinalApp/AppExampleImages/admin.PNG)
 
 ### Manager Interface
-![Manager Interface](CSharpFinalCore/AppImages/manager.PNG)
+![Manager Interface](CSharpFinalApp/AppExampleImages/manager.PNG)
 
 ### Worker Interface
-![Worker Interface](CSharpFinalCore/AppImages/worker.PNG)
+![Worker Interface](CSharpFinalApp/AppExampleImages/worker.PNG)
 
 ## License
 This project is licensed under the MIT License - see the LICENSE.md file for details

@@ -7,7 +7,8 @@ namespace CSharpFinalData.Data.Models;
 public class EmployeesModel: BaseModel
 {
     [PrimaryKey("id")]
-    public int Id { get; set; }
+    [Column("id")]
+    public string Id { get; set; } 
     
     [Column("Name")]
     public string Name { get; set; }
@@ -23,14 +24,14 @@ public class EmployeesModel: BaseModel
     
     public EmployeesModel()
     {
-        Id = 0;
+        Id = string.Empty; 
         Name = string.Empty;
         Email = string.Empty;
         RoleId = 0;
         Password = string.Empty;
     }
     
-    public EmployeesModel(int id, string name, string email, int roleId, string password): this()
+    public EmployeesModel(string id, string name, string email, int roleId, string password): this()
     {
         Id = id;
         Name = name;

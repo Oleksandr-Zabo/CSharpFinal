@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using CSharpFinalCore.Core.Entity;
 using CSharpFinalData.Data.RepositoryImpl.AdminRepositoryImpl;
+using CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
 public class AdminService
 {
@@ -29,10 +30,11 @@ public class AdminServiceTests
     public async Task GetEmployeesAsync_ReturnsMappedEmployees()
     {
         // Arrange
-        var mockRepo = new Mock<AdminRepositoryImpl>(null);
+        var mockSupabase = new Mock<SupabaseService>();
+        var mockRepo = new Mock<AdminRepositoryImpl>(MockBehavior.Default, mockSupabase.Object);
         var employees = new List<Employees>
         {
-            new Employees(1, "Test", "test@mail.com", 1, "pass")
+            new Employees("1", "Test", "test@mail.com", 1, "pass") // Updated Id to string
         };
         mockRepo.Setup(r => r.GetAllEmployeesAsync()).ReturnsAsync(employees);
 

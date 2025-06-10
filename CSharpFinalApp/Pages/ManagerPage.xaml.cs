@@ -14,9 +14,10 @@ namespace CSharpFinal.Pages;
 public partial class ManagerPage : UserControl
 {
     private readonly ManagerRepositoryImpl _managerRepository;
-    private readonly Employees _employee;
+    private readonly Employees? _employee;
     private List<Employees> _workers = new();
     private List<TaskViewModel> _tasks = new();
+    private System.Timers.Timer? _workerMonitorTimer;
 
     public ManagerPage(Employees employee, ManagerRepositoryImpl? repository)
     {
@@ -24,12 +25,19 @@ public partial class ManagerPage : UserControl
         _employee = employee ?? throw new ArgumentNullException(nameof(employee));
         _managerRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         Loaded += ManagerPage_Loaded;
+        Unloaded += ManagerPage_Unloaded;
+        // Timer for monitoring workers every 5 seconds
+        _workerMonitorTimer = new System.Timers.Timer(5000);
+        _workerMonitorTimer.Elapsed += async (s, e) => await Dispatcher.InvokeAsync(LoadWorkersAsync);
+        _workerMonitorTimer.AutoReset = true;
+        _workerMonitorTimer.Enabled = true;
     }
 
     private async void ManagerPage_Loaded(object sender, RoutedEventArgs e)
     {
         await LoadWorkersAsync();
         await LoadTasksAsync();
+        _workerMonitorTimer?.Start();
     }
 
     private async Task LoadWorkersAsync()
@@ -57,7 +65,7 @@ public partial class ManagerPage : UserControl
             {
                 Id = t.Id,
                 Description = t.Description,
-                WorkerId = t.EmployeeId,
+                WorkerId = t.EmployeeId, // Updated to string
                 WorkerName = _workers.FirstOrDefault(w => w.Id == t.EmployeeId)?.Name ?? "—",
                 Deadline = t.Deadline,
                 Status = t.Status
@@ -127,7 +135,7 @@ public partial class ManagerPage : UserControl
             MessageBox.Show("Помилка при виході: " + ex.Message);
             return;
         }
-        var mainWindow = (MainWindow)Application.Current.MainWindow;
+        var mainWindow = Application.Current?.MainWindow as MainWindow;
         mainWindow?.MainWindowFrame.Navigate(new LoginPage());
     }
     
@@ -193,14 +201,24 @@ public partial class ManagerPage : UserControl
         }
     }
 
+    private void ManagerPage_Unloaded(object sender, RoutedEventArgs e)
+    {
+        if (_workerMonitorTimer != null)
+        {
+            _workerMonitorTimer.Stop();
+            _workerMonitorTimer.Dispose();
+            _workerMonitorTimer = null;
+        }
+    }
+
     // View model for DataGrid
     private class TaskViewModel
     {
         public int Id { get; set; }
-        public string Description { get; set; }
-        public int WorkerId { get; set; }
-        public string WorkerName { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public string WorkerId { get; set; } = string.Empty;
+        public string WorkerName { get; set; } = string.Empty;
         public DateTime Deadline { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
     }
 }

@@ -17,6 +17,7 @@ public partial class ManagerPage : UserControl
     private readonly Employees? _employee;
     private List<Employees> _workers = new();
     private List<TaskViewModel> _tasks = new();
+    private System.Timers.Timer? _workerMonitorTimer;
 
     public ManagerPage(Employees employee, ManagerRepositoryImpl? repository)
     {
@@ -24,12 +25,19 @@ public partial class ManagerPage : UserControl
         _employee = employee ?? throw new ArgumentNullException(nameof(employee));
         _managerRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         Loaded += ManagerPage_Loaded;
+        Unloaded += ManagerPage_Unloaded;
+        // Timer for monitoring workers every 5 seconds
+        _workerMonitorTimer = new System.Timers.Timer(5000);
+        _workerMonitorTimer.Elapsed += async (s, e) => await Dispatcher.InvokeAsync(LoadWorkersAsync);
+        _workerMonitorTimer.AutoReset = true;
+        _workerMonitorTimer.Enabled = true;
     }
 
     private async void ManagerPage_Loaded(object sender, RoutedEventArgs e)
     {
         await LoadWorkersAsync();
         await LoadTasksAsync();
+        _workerMonitorTimer?.Start();
     }
 
     private async Task LoadWorkersAsync()
@@ -190,6 +198,16 @@ public partial class ManagerPage : UserControl
         catch (Exception ex)
         {
             MessageBox.Show("Помилка при видаленні виконаних завдань: " + ex.Message);
+        }
+    }
+
+    private void ManagerPage_Unloaded(object sender, RoutedEventArgs e)
+    {
+        if (_workerMonitorTimer != null)
+        {
+            _workerMonitorTimer.Stop();
+            _workerMonitorTimer.Dispose();
+            _workerMonitorTimer = null;
         }
     }
 

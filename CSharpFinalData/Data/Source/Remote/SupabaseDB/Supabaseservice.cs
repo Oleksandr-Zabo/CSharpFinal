@@ -8,27 +8,54 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Supabase.Gotrue;
+using System.IO;
 
 namespace CSharpFinalData.Data.Source.Remote.SupabaseDB;
 
 
 public class SupabaseService
 {
-    private const string SupabaseUrl = "https://blsbwhilzmlhlhxywfpl.supabase.co";
-    private const string SupabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsc2J3aGlsem1saGxoeHl3ZnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU5NDg0MTYsImV4cCI6MjA2MTUyNDQxNn0.QN24DqtBr6wFqHNyAYw-XOoHGxbxx0fneOoDJxFsDHo";
-    private const string ServiceRoleKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsc2J3aGlsem1saGxoeHl3ZnBsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTk0ODQxNiwiZXhwIjoyMDYxNTI0NDE2fQ.dH5PW2YV4vJ7JarMGwWDUlk-NT-5dNc5VxMpRUEmWqQ";
+    private static string SupabaseUrl;
+    private static string SupabaseKey;
+    private static string ServiceRoleKey;
     
     private readonly Supabase.Client _client;
     private readonly HttpClient _httpClient;
 
     public SupabaseUser? SupabaseUser { get; set; } = null;
-        
     public bool IsLoggedIn { get; set; } = false;
-        
     private static SupabaseService? _instance;//for pattern Singleton
     private static readonly object Lock = new();
+    private static bool _keysLoaded = false;
+    
+    private class SupabaseKeys
+    {
+        public string SupabaseUrl { get; set; } = string.Empty;
+        public string SupabaseKey { get; set; } = string.Empty;
+        public string ServiceRoleKey { get; set; } = string.Empty;
+    }
+
+    public static async Task InitKeysAsync()
+    {
+        if (_keysLoaded) return;
+        string solutionDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        string keysPath = Path.Combine(solutionDirectory, "CSharpFinalCore", ".env", "supabase_keys.json");
+        if (!File.Exists(keysPath))
+            throw new Exception($"Supabase keys file not found at: {keysPath}");
+        var json = await File.ReadAllTextAsync(keysPath);
+        var keys = System.Text.Json.JsonSerializer.Deserialize<SupabaseKeys>(json);
+        if (keys == null || string.IsNullOrWhiteSpace(keys.SupabaseUrl) || string.IsNullOrWhiteSpace(keys.SupabaseKey) || string.IsNullOrWhiteSpace(keys.ServiceRoleKey))
+            throw new Exception("Supabase keys are missing or invalid in supabase_keys.json");
+        SupabaseUrl = keys.SupabaseUrl;
+        SupabaseKey = keys.SupabaseKey;
+        ServiceRoleKey = keys.ServiceRoleKey;
+        _keysLoaded = true;
+    }
+
     public SupabaseService()
     {
+        if (!_keysLoaded)
+            throw new Exception("SupabaseService keys not loaded. Call SupabaseService.InitKeysAsync() before using the service.");
         try
         {
             var options = new Supabase.SupabaseOptions

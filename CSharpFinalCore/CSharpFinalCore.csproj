@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Content Include=".env\supabase_keys.json" />
+    </ItemGroup>
+
 </Project>

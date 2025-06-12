@@ -303,15 +303,18 @@ public partial class ManagerPage : UserControl
 
     private bool AreTasksEqual(List<TaskViewModel> list1, List<TaskViewModel> list2)
     {
-        if (list1.Count != list2.Count) return false;
-        for (int i = 0; i < list1.Count; i++)
+        var sortedList1 = list1.OrderBy(t => t.Id).ToList();
+        var sortedList2 = list2.OrderBy(t => t.Id).ToList();
+
+        if (sortedList1.Count != sortedList2.Count) return false;
+        for (int i = 0; i < sortedList1.Count; i++)
         {
-            if (list1[i].Id != list2[i].Id ||
-                list1[i].Description != list2[i].Description ||
-                list1[i].WorkerId != list2[i].WorkerId ||
-                list1[i].WorkerName != list2[i].WorkerName ||
-                list1[i].Deadline != list2[i].Deadline ||
-                list1[i].Status != list2[i].Status)
+            if (sortedList1[i].Id != sortedList2[i].Id ||
+                sortedList1[i].Description != sortedList2[i].Description ||
+                sortedList1[i].WorkerId != sortedList2[i].WorkerId ||
+                sortedList1[i].WorkerName != sortedList2[i].WorkerName ||
+                sortedList1[i].Deadline != sortedList2[i].Deadline ||
+                sortedList1[i].Status != sortedList2[i].Status)
                 return false;
         }
         return true;

@@ -15,6 +15,7 @@ public partial class WorkerPage : UserControl
     private readonly WorkerRepositoryImpl _workerRepository;
     private readonly Employees _employee;
     private List<TaskViewModel> _tasks = new();
+    private List<TaskViewModel> _currentTasks = new(); // For monitoring changes
     private string _roleName = "";
     private System.Timers.Timer? _taskMonitorTimer;
 
@@ -25,9 +26,9 @@ public partial class WorkerPage : UserControl
         _workerRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         Loaded += WorkerPage_Loaded;
         Unloaded += WorkerPage_Unloaded;
-        // Set up a timer to monitor for new tasks every 5 seconds
-        _taskMonitorTimer = new System.Timers.Timer(5000); // 5 seconds
-        _taskMonitorTimer.Elapsed += async (s, e) => await Dispatcher.InvokeAsync(LoadTasksAsync);
+        // Set up a timer to monitor for new tasks every 3 seconds
+        _taskMonitorTimer = new System.Timers.Timer(3000); // 3 seconds
+        _taskMonitorTimer.Elapsed += async (s, e) => await MonitorTasksAsync();
         _taskMonitorTimer.AutoReset = true;
         _taskMonitorTimer.Enabled = true;
     }
@@ -36,6 +37,7 @@ public partial class WorkerPage : UserControl
     {
         await LoadWorkerInfoAsync();
         await LoadTasksAsync();
+        _currentTasks = GetCurrentTasksSnapshot();
         _taskMonitorTimer?.Start();
     }
 
@@ -160,6 +162,57 @@ public partial class WorkerPage : UserControl
             _taskMonitorTimer.Dispose();
             _taskMonitorTimer = null;
         }
+    }
+
+    private List<TaskViewModel> GetCurrentTasksSnapshot()
+    {
+        // Return a shallow copy for comparison
+        return _tasks.Select(t => new TaskViewModel
+        {
+            Id = t.Id,
+            Description = t.Description,
+            Deadline = t.Deadline,
+            Status = t.Status
+        }).ToList();
+    }
+
+    private async Task MonitorTasksAsync()
+    {
+        try
+        {
+            var allTasks = await _workerRepository.GetAllTasksByEmployeeId(_employee.Id);
+            var newTasks = allTasks?.Select(t => new TaskViewModel
+            {
+                Id = t.Id,
+                Description = t.Description,
+                Deadline = t.Deadline,
+                Status = NormalizeStatus(t.Status)
+            }).ToList() ?? new List<TaskViewModel>();
+            if (!AreTasksEqual(newTasks, _currentTasks))
+            {
+                _tasks = newTasks;
+                _currentTasks = GetCurrentTasksSnapshot();
+                await Dispatcher.InvokeAsync(() => TasksDataGrid.ItemsSource = _tasks);
+            }
+        }
+        catch
+        {
+            // Optionally log or handle error
+        }
+    }
+
+    private bool AreTasksEqual(List<TaskViewModel> list1, List<TaskViewModel> list2)
+    {
+        if (list1.Count != list2.Count) return false;
+        for (int i = 0; i < list1.Count; i++)
+        {
+            if (list1[i].Id != list2[i].Id ||
+                list1[i].Description != list2[i].Description ||
+                list1[i].Deadline != list2[i].Deadline ||
+                list1[i].Status != list2[i].Status)
+                return false;
+        }
+        return true;
     }
 
     private class TaskViewModel

@@ -262,10 +262,23 @@ public partial class ManagerPage : UserControl
 
     private List<TaskViewModel> GetCurrentTasksSnapshot()
     {
-        // Use the helper method to create the snapshot
-        return CreateTaskViewModelList(_tasks, null);
+        // Convert TaskViewModel objects to Task objects before creating the snapshot
+        var tasks = ConvertTaskViewModelsToTasks(_tasks);
+        return CreateTaskViewModelList(tasks, null);
     }
 
+    private List<Task> ConvertTaskViewModelsToTasks(List<TaskViewModel> taskViewModels)
+    {
+        return taskViewModels.Select(tv => new Task
+        {
+            Id = tv.Id,
+            Description = tv.Description,
+            WorkerId = tv.WorkerId,
+            WorkerName = tv.WorkerName,
+            Deadline = tv.Deadline,
+            Status = tv.Status
+        }).ToList();
+    }
     private List<TaskViewModel> CreateTaskViewModelList(List<Task> tasks, List<Employees>? workers)
     {
         return tasks.Select(t => new TaskViewModel

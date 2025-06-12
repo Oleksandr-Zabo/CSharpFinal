@@ -30,12 +30,12 @@ public partial class ManagerPage : UserControl
         Loaded += ManagerPage_Loaded;
         Unloaded += ManagerPage_Unloaded;
         // Timer for monitoring workers every 10 seconds
-        _workerMonitorTimer = new System.Timers.Timer(10000);
+        _workerMonitorTimer = new System.Timers.Timer(WORKER_MONITOR_INTERVAL);
         _workerMonitorTimer.Elapsed += async (s, e) => await MonitorWorkersAsync();
         _workerMonitorTimer.AutoReset = true;
         _workerMonitorTimer.Enabled = true;
         // Timer for monitoring tasks every 3 seconds
-        _taskMonitorTimer = new System.Timers.Timer(3000);
+        _taskMonitorTimer = new System.Timers.Timer(TASK_MONITOR_INTERVAL);
         _taskMonitorTimer.Elapsed += async (s, e) => await MonitorTasksAsync();
         _taskMonitorTimer.AutoReset = true;
         _taskMonitorTimer.Enabled = true;

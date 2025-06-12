@@ -195,9 +195,9 @@ public partial class WorkerPage : UserControl
                 await Dispatcher.InvokeAsync(() => TasksDataGrid.ItemsSource = _tasks);
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Optionally log or handle error
+            MessageBox.Show("Помилка при моніторингу завдань: " + ex.Message);
         }
     }
 

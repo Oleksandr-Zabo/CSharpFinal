@@ -187,7 +187,7 @@ public partial class WorkerPage : UserControl
                 Description = t.Description,
                 Deadline = t.Deadline,
                 Status = NormalizeStatus(t.Status)
-            }).ToList() ?? new List<TaskViewModel>();
+            }).OrderBy(t => t.Id).ToList() ?? new List<TaskViewModel>();
             if (!AreTasksEqual(newTasks, _currentTasks))
             {
                 _tasks = newTasks;

@@ -27,7 +27,7 @@ public partial class WorkerPage : UserControl
         Loaded += WorkerPage_Loaded;
         Unloaded += WorkerPage_Unloaded;
         // Set up a timer to monitor for new tasks every 3 seconds
-        _taskMonitorTimer = new System.Timers.Timer(3000); // 3 seconds
+        _taskMonitorTimer = new System.Timers.Timer(TaskMonitorIntervalMs);
         _taskMonitorTimer.Elapsed += async (s, e) => await MonitorTasksAsync();
         _taskMonitorTimer.AutoReset = true;
         _taskMonitorTimer.Enabled = true;

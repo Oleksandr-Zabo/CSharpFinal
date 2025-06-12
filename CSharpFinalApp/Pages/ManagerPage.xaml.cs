@@ -262,13 +262,18 @@ public partial class ManagerPage : UserControl
 
     private List<TaskViewModel> GetCurrentTasksSnapshot()
     {
-        // Return a shallow copy for comparison
-        return _tasks.Select(t => new TaskViewModel
+        // Use the helper method to create the snapshot
+        return CreateTaskViewModelList(_tasks, null);
+    }
+
+    private List<TaskViewModel> CreateTaskViewModelList(List<Task> tasks, List<Employees>? workers)
+    {
+        return tasks.Select(t => new TaskViewModel
         {
             Id = t.Id,
             Description = t.Description,
             WorkerId = t.WorkerId,
-            WorkerName = t.WorkerName,
+            WorkerName = workers?.FirstOrDefault(w => w.Id == t.WorkerId)?.Name ?? t.WorkerName ?? "—",
             Deadline = t.Deadline,
             Status = t.Status
         }).ToList();

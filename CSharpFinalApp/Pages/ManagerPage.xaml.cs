@@ -13,6 +13,9 @@ namespace CSharpFinal.Pages;
 
 public partial class ManagerPage : UserControl
 {
+    private const int WORKER_MONITOR_INTERVAL = 10000;
+    private const int TASK_MONITOR_INTERVAL = 3000;
+
     private readonly ManagerRepositoryImpl _managerRepository;
     private readonly Employees? _employee;
     private List<Employees> _workers = new();
@@ -76,7 +79,7 @@ public partial class ManagerPage : UserControl
             {
                 Id = t.Id,
                 Description = t.Description,
-                WorkerId = t.EmployeeId, // Updated to string
+                WorkerId = t.EmployeeId, // Correct type: int
                 WorkerName = _workers.FirstOrDefault(w => w.Id == t.EmployeeId)?.Name ?? "—",
                 Deadline = t.Deadline,
                 Status = t.Status
@@ -262,31 +265,13 @@ public partial class ManagerPage : UserControl
 
     private List<TaskViewModel> GetCurrentTasksSnapshot()
     {
-        // Convert TaskViewModel objects to Task objects before creating the snapshot
-        var tasks = ConvertTaskViewModelsToTasks(_tasks);
-        return CreateTaskViewModelList(tasks, null);
-    }
-
-    private List<Task> ConvertTaskViewModelsToTasks(List<TaskViewModel> taskViewModels)
-    {
-        return taskViewModels.Select(tv => new Task
-        {
-            Id = tv.Id,
-            Description = tv.Description,
-            WorkerId = tv.WorkerId,
-            WorkerName = tv.WorkerName,
-            Deadline = tv.Deadline,
-            Status = tv.Status
-        }).ToList();
-    }
-    private List<TaskViewModel> CreateTaskViewModelList(List<Task> tasks, List<Employees>? workers)
-    {
-        return tasks.Select(t => new TaskViewModel
+        // Return a shallow copy for comparison
+        return _tasks.Select(t => new TaskViewModel
         {
             Id = t.Id,
             Description = t.Description,
             WorkerId = t.WorkerId,
-            WorkerName = workers?.FirstOrDefault(w => w.Id == t.WorkerId)?.Name ?? t.WorkerName ?? "—",
+            WorkerName = t.WorkerName,
             Deadline = t.Deadline,
             Status = t.Status
         }).ToList();
@@ -343,7 +328,7 @@ public partial class ManagerPage : UserControl
     {
         public int Id { get; set; }
         public string Description { get; set; } = string.Empty;
-        public string WorkerId { get; set; } = string.Empty;
+        public string WorkerId { get; set; }
         public string WorkerName { get; set; } = string.Empty;
         public DateTime Deadline { get; set; }
         public string Status { get; set; } = string.Empty;

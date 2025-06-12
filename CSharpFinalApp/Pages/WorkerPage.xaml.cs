@@ -18,6 +18,7 @@ public partial class WorkerPage : UserControl
     private List<TaskViewModel> _currentTasks = new(); // For monitoring changes
     private string _roleName = "";
     private System.Timers.Timer? _taskMonitorTimer;
+    private const int TaskMonitorIntervalMs = 3000;
 
     public WorkerPage(Employees employee, WorkerRepositoryImpl? repository)
     {

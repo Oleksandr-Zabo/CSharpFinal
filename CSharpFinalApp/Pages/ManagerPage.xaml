@@ -109,17 +109,6 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Border>
-                        <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 15 0 0"
-                                FontSize="14"
-                                Height="40" Width="200"
-                                Foreground="Azure"
-                                Style="{StaticResource MaterialDesignRaisedButton}"
-                                Click="OnUpdateTasksClick">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <materialDesign:PackIcon Kind="Refresh" Width="20" Height="20" Foreground="Azure" Margin="0,0,8,0"/>
-                                <TextBlock Text="Оновити завдання" VerticalAlignment="Center" Foreground="Azure"/>
-                            </StackPanel>
-                        </Button>
                         <!-- Buttons: Створити звіт and Видалити виконані завдання centered horizontally -->
                         <StackPanel Orientation="Horizontal" Margin="5,0,0,10" HorizontalAlignment="Center">
                             <Button materialDesign:ElevationAssist.Elevation="Dp7" Margin="10 10 0 0"

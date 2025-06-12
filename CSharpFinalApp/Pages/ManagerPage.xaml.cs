@@ -13,11 +13,17 @@ namespace CSharpFinal.Pages;
 
 public partial class ManagerPage : UserControl
 {
+    private const int WORKER_MONITOR_INTERVAL = 10000;
+    private const int TASK_MONITOR_INTERVAL = 3000;
+
     private readonly ManagerRepositoryImpl _managerRepository;
     private readonly Employees? _employee;
     private List<Employees> _workers = new();
     private List<TaskViewModel> _tasks = new();
     private System.Timers.Timer? _workerMonitorTimer;
+    private System.Timers.Timer? _taskMonitorTimer;
+    private List<Employees> _currentWorkers = new(); // For monitoring changes
+    private List<TaskViewModel> _currentTasks = new(); // For monitoring changes
 
     public ManagerPage(Employees employee, ManagerRepositoryImpl? repository)
     {
@@ -26,18 +32,26 @@ public partial class ManagerPage : UserControl
         _managerRepository = repository ?? throw new ArgumentNullException(nameof(repository));
         Loaded += ManagerPage_Loaded;
         Unloaded += ManagerPage_Unloaded;
-        // Timer for monitoring workers every 5 seconds
-        _workerMonitorTimer = new System.Timers.Timer(5000);
-        _workerMonitorTimer.Elapsed += async (s, e) => await Dispatcher.InvokeAsync(LoadWorkersAsync);
+        // Timer for monitoring workers every 10 seconds
+        _workerMonitorTimer = new System.Timers.Timer(WORKER_MONITOR_INTERVAL);
+        _workerMonitorTimer.Elapsed += async (s, e) => await MonitorWorkersAsync();
         _workerMonitorTimer.AutoReset = true;
         _workerMonitorTimer.Enabled = true;
+        // Timer for monitoring tasks every 3 seconds
+        _taskMonitorTimer = new System.Timers.Timer(TASK_MONITOR_INTERVAL);
+        _taskMonitorTimer.Elapsed += async (s, e) => await MonitorTasksAsync();
+        _taskMonitorTimer.AutoReset = true;
+        _taskMonitorTimer.Enabled = true;
     }
 
     private async void ManagerPage_Loaded(object sender, RoutedEventArgs e)
     {
         await LoadWorkersAsync();
+        _currentWorkers = GetCurrentWorkersSnapshot();
         await LoadTasksAsync();
+        _currentTasks = GetCurrentTasksSnapshot();
         _workerMonitorTimer?.Start();
+        _taskMonitorTimer?.Start();
     }
 
     private async Task LoadWorkersAsync()
@@ -65,7 +79,7 @@ public partial class ManagerPage : UserControl
             {
                 Id = t.Id,
                 Description = t.Description,
-                WorkerId = t.EmployeeId, // Updated to string
+                WorkerId = t.EmployeeId, // Correct type: int
                 WorkerName = _workers.FirstOrDefault(w => w.Id == t.EmployeeId)?.Name ?? "—",
                 Deadline = t.Deadline,
                 Status = t.Status
@@ -115,11 +129,6 @@ public partial class ManagerPage : UserControl
         {
             MessageBox.Show("Помилка при додаванні завдання: " + ex.Message);
         }
-    }
-
-    private async void OnUpdateTasksClick(object sender, RoutedEventArgs e)
-    {
-        await LoadTasksAsync();
     }
 
     private async void OnLogoutClick(object sender, RoutedEventArgs e)
@@ -209,6 +218,109 @@ public partial class ManagerPage : UserControl
             _workerMonitorTimer.Dispose();
             _workerMonitorTimer = null;
         }
+        if (_taskMonitorTimer != null)
+        {
+            _taskMonitorTimer.Stop();
+            _taskMonitorTimer.Dispose();
+            _taskMonitorTimer = null;
+        }
+    }
+
+    private List<Employees> GetCurrentWorkersSnapshot()
+    {
+        // Return a shallow copy for comparison
+        return _workers.Select(w => w).ToList();
+    }
+
+    private async Task MonitorWorkersAsync()
+    {
+        try
+        {
+            var allEmployees = await _managerRepository.GetAllEmployeesAsync();
+            var filteredWorkers = allEmployees.Where(w => w.RoleId == 2 || w.RoleId == 3).ToList();
+            // Compare with _currentWorkers
+            if (!AreWorkersEqual(filteredWorkers, _currentWorkers))
+            {
+                _workers = filteredWorkers;
+                _currentWorkers = filteredWorkers.Select(w => w).ToList();
+                await Dispatcher.InvokeAsync(() => WorkerComboBox.ItemsSource = _workers);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Не вдалося оновити список працівників: " + ex.Message);
+        }
+    }
+
+    private bool AreWorkersEqual(List<Employees> list1, List<Employees> list2)
+    {
+        if (list1.Count != list2.Count) return false;
+        for (int i = 0; i < list1.Count; i++)
+        {
+            if (list1[i].Id != list2[i].Id || list1[i].Name != list2[i].Name)
+                return false;
+        }
+        return true;
+    }
+
+    private List<TaskViewModel> GetCurrentTasksSnapshot()
+    {
+        // Return a shallow copy for comparison
+        return _tasks.Select(t => new TaskViewModel
+        {
+            Id = t.Id,
+            Description = t.Description,
+            WorkerId = t.WorkerId,
+            WorkerName = t.WorkerName,
+            Deadline = t.Deadline,
+            Status = t.Status
+        }).ToList();
+    }
+
+    private async Task MonitorTasksAsync()
+    {
+        try
+        {
+            var allTasks = await _managerRepository.GetAllTasksAsync();
+            var newTasks = allTasks.Select(t => new TaskViewModel
+            {
+                Id = t.Id,
+                Description = t.Description,
+                WorkerId = t.EmployeeId,
+                WorkerName = _workers.FirstOrDefault(w => w.Id == t.EmployeeId)?.Name ?? "—",
+                Deadline = t.Deadline,
+                Status = t.Status
+            }).ToList();
+            if (!AreTasksEqual(newTasks, _currentTasks))
+            {
+                _tasks = newTasks;
+                _currentTasks = GetCurrentTasksSnapshot();
+                await Dispatcher.InvokeAsync(() => TasksDataGrid.ItemsSource = _tasks);
+            }
+        }
+        catch(Exception ex)
+        {
+            MessageBox.Show("Помилка при моніторингу завдань: " + ex.Message);
+        }
+    }
+
+    private bool AreTasksEqual(List<TaskViewModel> list1, List<TaskViewModel> list2)
+    {
+        var sortedList1 = list1.OrderBy(t => t.Id).ToList();
+        var sortedList2 = list2.OrderBy(t => t.Id).ToList();
+
+        if (sortedList1.Count != sortedList2.Count) return false;
+        for (int i = 0; i < sortedList1.Count; i++)
+        {
+            if (sortedList1[i].Id != sortedList2[i].Id ||
+                sortedList1[i].Description != sortedList2[i].Description ||
+                sortedList1[i].WorkerId != sortedList2[i].WorkerId ||
+                sortedList1[i].WorkerName != sortedList2[i].WorkerName ||
+                sortedList1[i].Deadline != sortedList2[i].Deadline ||
+                sortedList1[i].Status != sortedList2[i].Status)
+                return false;
+        }
+        return true;
     }
 
     // View model for DataGrid
@@ -216,7 +328,7 @@ public partial class ManagerPage : UserControl
     {
         public int Id { get; set; }
         public string Description { get; set; } = string.Empty;
-        public string WorkerId { get; set; } = string.Empty;
+        public string WorkerId { get; set; }
         public string WorkerName { get; set; } = string.Empty;
         public DateTime Deadline { get; set; }
         public string Status { get; set; } = string.Empty;

@@ -155,6 +155,9 @@ The system comes with pre-configured users for testing and initial setup:
 ### Worker Interface
 ![Worker Interface](CSharpFinalApp/AppExampleImages/worker.PNG)
 
+### View project presentation
+[View canva here](https://canva.link/nfqpuz03d6lj6x4)
+
 ## License
 This project is licensed under the MIT License - see the LICENSE.md file for details
 
